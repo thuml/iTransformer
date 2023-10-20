@@ -1,16 +1,21 @@
 # iTransformer
 
-This repo is the official implementation of "[iTransformer: Inverted Transformers Are Effective for Time Series Forecasting](https://arxiv.org/abs/2310.06625)" as well as the follow-ups. It currently includes code and models for the following tasks:
+This repo is the official implementation of "[iTransformer: Inverted Transformers Are Effective for Time Series Forecasting](https://arxiv.org/abs/2310.06625)" as well as the follow-ups. It currently includes code implementations for the following tasks:
 
-> **Multivariate Forecasting**
+> **Multivariate Forecasting**: We provide all trainng scripts for the reproduction in this repo.
 
-> **Boosting Forecasting Performance of Transformers**
+> **Boosting Forecasting Performance of Transformers**: We are continuously incorporating Transformer variants in this repository. If you are interested in how well your Transformer works for forecasting tasks, feel free to pose an issue.
 
-> **Generalization on Unseen Variates**
+> **Generalization on Unseen Variates**: While Transformer has achieved tremendous success in NLP and CV, growing into the foundation model that follows the scaling law, we find that iTransformer has the potential to generalize on other time series variates, making it a nice alternative as the fundamental backbone of large TS model.
 
-> **Better Utilization of Larger Lookback**
+> **Better Utilization of Larger Lookback**: Previous Transformers do not necessarily benefit from larger historical observations attributed to the distracted attention, our model can achieve a better utilization of arbitrary lookback windows.
 
-> **Adopt Efficienting Attention Modules**
+> **Adopt Efficienting Attention Modules**: iTransformer essentially presupposes no more specific requirements on Transformer modules. A bundle of efficient attention mechanisms can be the plugins, reducing the complexity when the variate number grows large.
+
+# Updates
+
+:triangular_flag_on_post: **News** (2023.10) iTransformer has been included in [[Time-Series-Library]](https://github.com/thuml/Time-Series-Library) and achieve the consistent state-of-the-art in long-term time series forecasting.
+
 
 ## Usage 
 
@@ -18,7 +23,7 @@ This repo is the official implementation of "[iTransformer: Inverted Transformer
 ```
 pip install -r requirements.txt
 ```
-1. All the benchmark datasets can be obtained from [Google Drive]() or [Tsinghua Cloud](). # TODO: Add link and include alipay data
+1. All the benchmark datasets can be obtained from [Google Drive]() or [Tsinghua Cloud](). # TODO: Add link and include alipay data.
 2. Train and evaluate model. We provide the experiment scripts of all benchmarks under the folder ./scripts/. You can reproduce the experiment results as the following examples:
 
 ```
@@ -40,10 +45,13 @@ bash ./scripts/efficient_attentions/iFlashTransformer.sh
 
 ## Introduction
 
+
+😊 **iTransformer** is repurposed on the vanilla Transformer that regards independent time series as tokens to capture multivariate correlations by self-attention and utilize layernorm and feed-forward network to learn better series-global representations for forecasting.
+
 🏆 iTransformer takes an **overall lead** in complex time series forecasting tasks to solve the pain points of Transformer modeling time series data.
 
 <p align="center">
-<img src="./figures/radar.png" height = "270" alt="" align=center />
+<img src="./figures/radar.png" height = "360" alt="" align=center />
 </p>
 
 🌟 Considering the characteristics of multivariate time series, iTransformer breaks the conventional model structure without modifying any Transformer module.
