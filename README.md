@@ -95,10 +95,8 @@ We evaluate the iTransformer on six challenging multivariate forecasting benchma
 
 
 <p align="center">
-<img src="./figures/main_results.png" alt="" align=center />
+<img src="./figures/main_results_alipay.png" alt="" align=center />
 </p>
-
-\# TODO: Replace the Table
 
 ## General Performance Boosting on Transformers
 
