@@ -1,6 +1,6 @@
 export CUDA_VISIBLE_DEVICES=2
 
-model_name=Transformer
+model_name=Flowformer
 
 python -u run.py \
   --task_name long_term_forecast \
@@ -91,7 +91,7 @@ python -u run.py \
   --batch_size 128 \
   --itr 1
 
-model_name=iTransformer
+model_name=iFlowformer
 
 python -u run.py \
   --task_name long_term_forecast \

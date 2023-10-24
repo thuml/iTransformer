@@ -1,6 +1,6 @@
-export CUDA_VISIBLE_DEVICES=2
+export CUDA_VISIBLE_DEVICES=0
 
-model_name=Transformer
+model_name=Flashformer
 
 python -u run.py \
   --task_name long_term_forecast \
@@ -91,7 +91,7 @@ python -u run.py \
   --batch_size 128 \
   --itr 1
 
-model_name=iTransformer
+model_name=iFlashformer
 
 python -u run.py \
   --task_name long_term_forecast \
@@ -112,8 +112,8 @@ python -u run.py \
   --dec_in 21 \
   --c_out 21 \
   --des 'Exp' \
-  --itr 1 \
   --batch_size 128 \
+  --itr 1 \
   --train_epochs 3
 
 python -u run.py \

@@ -1,13 +1,13 @@
-export CUDA_VISIBLE_DEVICES=2
+export CUDA_VISIBLE_DEVICES=1
 
-model_name=Transformer
+model_name=Flowformer
 
 python -u run.py \
   --task_name long_term_forecast \
   --is_training 1 \
-  --root_path ./dataset/weather/ \
-  --data_path weather.csv \
-  --model_id weather_96_96 \
+  --root_path ./dataset/traffic/ \
+  --data_path traffic.csv \
+  --model_id traffic_96_96 \
   --model $model_name \
   --data custom \
   --features M \
@@ -17,20 +17,19 @@ python -u run.py \
   --e_layers 2 \
   --d_layers 1 \
   --factor 3 \
-  --enc_in 21 \
-  --dec_in 21 \
-  --c_out 21 \
+  --enc_in 862 \
+  --dec_in 862 \
+  --c_out 862 \
   --des 'Exp' \
   --itr 1 \
-  --batch_size 128 \
   --train_epochs 3
 
 python -u run.py \
   --task_name long_term_forecast \
   --is_training 1 \
-  --root_path ./dataset/weather/ \
-  --data_path weather.csv \
-  --model_id weather_96_192 \
+  --root_path ./dataset/traffic/ \
+  --data_path traffic.csv \
+  --model_id traffic_96_192 \
   --model $model_name \
   --data custom \
   --features M \
@@ -40,19 +39,19 @@ python -u run.py \
   --e_layers 2 \
   --d_layers 1 \
   --factor 3 \
-  --enc_in 21 \
-  --dec_in 21 \
-  --c_out 21 \
+  --enc_in 862 \
+  --dec_in 862 \
+  --c_out 862 \
   --des 'Exp' \
-  --batch_size 128 \
-  --itr 1
+  --itr 1 \
+  --train_epochs 3
 
 python -u run.py \
   --task_name long_term_forecast \
   --is_training 1 \
-  --root_path ./dataset/weather/ \
-  --data_path weather.csv \
-  --model_id weather_96_336 \
+  --root_path ./dataset/traffic/ \
+  --data_path traffic.csv \
+  --model_id traffic_96_336 \
   --model $model_name \
   --data custom \
   --features M \
@@ -62,19 +61,19 @@ python -u run.py \
   --e_layers 2 \
   --d_layers 1 \
   --factor 3 \
-  --enc_in 21 \
-  --dec_in 21 \
-  --c_out 21 \
+  --enc_in 862 \
+  --dec_in 862 \
+  --c_out 862 \
   --des 'Exp' \
-  --batch_size 128 \
-  --itr 1
+  --itr 1 \
+  --train_epochs 3
 
 python -u run.py \
   --task_name long_term_forecast \
   --is_training 1 \
-  --root_path ./dataset/weather/ \
-  --data_path weather.csv \
-  --model_id weather_96_720 \
+  --root_path ./dataset/traffic/ \
+  --data_path traffic.csv \
+  --model_id traffic_96_720 \
   --model $model_name \
   --data custom \
   --features M \
@@ -84,21 +83,22 @@ python -u run.py \
   --e_layers 2 \
   --d_layers 1 \
   --factor 3 \
-  --enc_in 21 \
-  --dec_in 21 \
-  --c_out 21 \
+  --enc_in 862 \
+  --dec_in 862 \
+  --c_out 862 \
   --des 'Exp' \
-  --batch_size 128 \
-  --itr 1
+  --itr 1 \
+  --train_epochs 3
 
-model_name=iTransformer
+
+model_name=iFlowformer
 
 python -u run.py \
   --task_name long_term_forecast \
   --is_training 1 \
-  --root_path ./dataset/weather/ \
-  --data_path weather.csv \
-  --model_id weather_96_96 \
+  --root_path ./dataset/traffic/ \
+  --data_path traffic.csv \
+  --model_id traffic_96_96 \
   --model $model_name \
   --data custom \
   --features M \
@@ -108,20 +108,19 @@ python -u run.py \
   --e_layers 2 \
   --d_layers 1 \
   --factor 3 \
-  --enc_in 21 \
-  --dec_in 21 \
-  --c_out 21 \
+  --enc_in 862 \
+  --dec_in 862 \
+  --c_out 862 \
   --des 'Exp' \
   --itr 1 \
-  --batch_size 128 \
   --train_epochs 3
 
 python -u run.py \
   --task_name long_term_forecast \
   --is_training 1 \
-  --root_path ./dataset/weather/ \
-  --data_path weather.csv \
-  --model_id weather_96_192 \
+  --root_path ./dataset/traffic/ \
+  --data_path traffic.csv \
+  --model_id traffic_96_192 \
   --model $model_name \
   --data custom \
   --features M \
@@ -131,19 +130,19 @@ python -u run.py \
   --e_layers 2 \
   --d_layers 1 \
   --factor 3 \
-  --enc_in 21 \
-  --dec_in 21 \
-  --c_out 21 \
+  --enc_in 862 \
+  --dec_in 862 \
+  --c_out 862 \
   --des 'Exp' \
-  --batch_size 128 \
-  --itr 1
+  --itr 1 \
+  --train_epochs 3
 
 python -u run.py \
   --task_name long_term_forecast \
   --is_training 1 \
-  --root_path ./dataset/weather/ \
-  --data_path weather.csv \
-  --model_id weather_96_336 \
+  --root_path ./dataset/traffic/ \
+  --data_path traffic.csv \
+  --model_id traffic_96_336 \
   --model $model_name \
   --data custom \
   --features M \
@@ -153,19 +152,19 @@ python -u run.py \
   --e_layers 2 \
   --d_layers 1 \
   --factor 3 \
-  --enc_in 21 \
-  --dec_in 21 \
-  --c_out 21 \
+  --enc_in 862 \
+  --dec_in 862 \
+  --c_out 862 \
   --des 'Exp' \
-  --batch_size 128 \
-  --itr 1
+  --itr 1 \
+  --train_epochs 3
 
 python -u run.py \
   --task_name long_term_forecast \
   --is_training 1 \
-  --root_path ./dataset/weather/ \
-  --data_path weather.csv \
-  --model_id weather_96_720 \
+  --root_path ./dataset/traffic/ \
+  --data_path traffic.csv \
+  --model_id traffic_96_720 \
   --model $model_name \
   --data custom \
   --features M \
@@ -175,9 +174,9 @@ python -u run.py \
   --e_layers 2 \
   --d_layers 1 \
   --factor 3 \
-  --enc_in 21 \
-  --dec_in 21 \
-  --c_out 21 \
+  --enc_in 862 \
+  --dec_in 862 \
+  --c_out 862 \
   --des 'Exp' \
-  --batch_size 128 \
-  --itr 1
+  --itr 1 \
+  --train_epochs 3
