@@ -90,7 +90,7 @@ if __name__ == '__main__':
     parser.add_argument('--p_hidden_layers', type=int, default=2, help='number of hidden layers in projector')
 
     # iTransformer
-    parser.add_argument('--exp_name', type=str, required=True, default='None',
+    parser.add_argument('--exp_name', type=str, required=False, default='None',
                         help='task name, options:[partial_train, zero_shot]')
 
     # parser.add_argument('--partial_train', type=bool, default=False, help='partial_train')
@@ -100,7 +100,6 @@ if __name__ == '__main__':
     parser.add_argument('--class_strategy', type=str, default='projection', help='projection/average/cls_token')
     parser.add_argument('--target_root_path', type=str, default='./data/ETT/', help='root path of the data file')
     parser.add_argument('--target_data_path', type=str, default='ETTh1.csv', help='data file')
-
 
     args = parser.parse_args()
     args.use_gpu = True if torch.cuda.is_available() and args.use_gpu else False

@@ -21,7 +21,8 @@ class Model(nn.Module):
         self.pred_len = configs.pred_len
         self.output_attention = configs.output_attention
         # Embedding
-        self.enc_embedding = DataEmbedding_inverted(configs.seq_len, configs.d_model, configs.embed, configs.freq, configs.dropout)
+        self.enc_embedding = DataEmbedding_inverted(configs.seq_len, configs.d_model, configs.embed, configs.freq,
+                                                    configs.dropout)
         # Encoder
         self.encoder = Encoder(
             [
@@ -49,7 +50,6 @@ class Model(nn.Module):
             self.dropout = nn.Dropout(configs.dropout)
             self.projection = nn.Linear(configs.d_model * configs.seq_len, configs.num_class)
 
-
     def encoder_top(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
         # Normalization from Non-stationary Transformer
         means = x_enc.mean(1, keepdim=True).detach()
@@ -57,10 +57,10 @@ class Model(nn.Module):
         stdev = torch.sqrt(torch.var(x_enc, dim=1, keepdim=True, unbiased=False) + 1e-5)
         x_enc /= stdev
 
-        _,_,N = x_enc.shape
+        _, _, N = x_enc.shape
 
         # Embedding
-        enc_out = self.enc_embedding(x_enc.permute(0,2,1), x_mark_enc)
+        enc_out = self.enc_embedding(x_enc.permute(0, 2, 1), x_mark_enc)
         return enc_out
 
     def encoder_bottom(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
@@ -70,10 +70,10 @@ class Model(nn.Module):
         stdev = torch.sqrt(torch.var(x_enc, dim=1, keepdim=True, unbiased=False) + 1e-5)
         x_enc /= stdev
 
-        _,_,N = x_enc.shape
+        _, _, N = x_enc.shape
 
         # Embedding
-        enc_out = self.enc_embedding(x_enc.permute(0,2,1), x_mark_enc)
+        enc_out = self.enc_embedding(x_enc.permute(0, 2, 1), x_mark_enc)
         enc_out, attns = self.encoder(enc_out, attn_mask=None)
         return enc_out
 
@@ -149,7 +149,8 @@ class Model(nn.Module):
         elif self.class_strategy == 'cls_token':
             # Embedding
             enc_out = self.enc_embedding(x_enc, None)
-            enc_out = torch.cat((self.cls_token.expand(enc_out.shape[0], -1, -1), enc_out), dim=1) #  (batch_size, N + 1, d_model)
+            enc_out = torch.cat((self.cls_token.expand(enc_out.shape[0], -1, -1), enc_out),
+                                dim=1)  # (batch_size, N + 1, d_model)
             enc_out, attns = self.encoder(enc_out, attn_mask=None)
 
             # Output
@@ -158,7 +159,7 @@ class Model(nn.Module):
             output = output[:, 0, :]  # (batch_size, d_model)
             output = self.projection(output)  # (batch_size, num_classes)
             return output
-        else: # projection
+        else:  # projection
             # Embedding
             enc_out = self.enc_embedding(x_enc, None)
             enc_out, attns = self.encoder(enc_out, attn_mask=None)

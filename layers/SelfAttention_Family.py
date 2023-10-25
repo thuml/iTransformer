@@ -6,6 +6,7 @@ from utils.masking import TriangularCausalMask, ProbMask
 from reformer_pytorch import LSHSelfAttention
 from einops import rearrange, repeat
 
+
 class FlowAttention(nn.Module):
     def __init__(self, attention_dropout=0.1):
         super(FlowAttention, self).__init__()
@@ -35,7 +36,8 @@ class FlowAttention(nn.Module):
         normalizer_col_refine = torch.softmax(normalizer_col_refine, dim=-1) * keys.shape[2]  # B h L vis
         # multiply
         kv = keys.transpose(-2, -1) @ (values * normalizer_col_refine[:, :, :, None])
-        x = (((queries @ kv) * normalizer_row[:, :, :, None]) * normalizer_row_refine[:, :, :, None]).transpose(1, 2).contiguous()
+        x = (((queries @ kv) * normalizer_row[:, :, :, None]) * normalizer_row_refine[:, :, :, None]).transpose(1,
+                                                                                                                2).contiguous()
         return x, None
 
 
@@ -150,7 +152,7 @@ class FlashAttention(nn.Module):
                 li_new = torch.exp(mi - mi_new) * li + torch.exp(m_block_ij - mi_new) * l_block_ij
 
                 O_BLOCKS[i] = (li / li_new) * torch.exp(mi - mi_new) * Oi + (
-                            torch.exp(m_block_ij - mi_new) / li_new) * P_ij_Vj
+                        torch.exp(m_block_ij - mi_new) / li_new) * P_ij_Vj
                 l_BLOCKS[i] = li_new
                 m_BLOCKS[i] = mi_new
 
@@ -160,8 +162,11 @@ class FlashAttention(nn.Module):
         return O, l, m
 
     def forward(self, queries, keys, values, attn_mask, tau=None, delta=None):
-        res =  self.flash_attention_forward(queries.permute(0, 2, 1, 3), keys.permute(0, 2, 1, 3), values.permute(0, 2, 1, 3), attn_mask)[0]
+        res = \
+        self.flash_attention_forward(queries.permute(0, 2, 1, 3), keys.permute(0, 2, 1, 3), values.permute(0, 2, 1, 3),
+                                     attn_mask)[0]
         return res.permute(0, 2, 1, 3).contiguous(), None
+
 
 class FullAttention(nn.Module):
     def __init__(self, mask_flag=True, factor=5, scale=None, attention_dropout=0.1, output_attention=False):
