@@ -2,13 +2,13 @@
 
 The repo is the official implementation for the paper: [iTransformer: Inverted Transformers Are Effective for Time Series Forecasting](https://arxiv.org/abs/2305.18803). It currently includes code implementations for the following tasks:
 
-> **Multivariate Forecasting**: We provide all scripts as well as the dataset for the reproduction of forecasting results in this repo.
+> **Multivariate Forecasting**: We provide all scripts as well as datasets for the reproduction of forecasting results in this repo.
 
 > **Boosting Forecasting of Transformers**: We are continuously incorporating Transformer variants. If you are interested in how well your inverted Transformer works for forecasting tasks, feel free to raise issues.
 
 > **Generalization on Unseen Variates**: iTransformer is demonstrated to generalize well on unseen time series, making it a nice alternative as the fundamental backbone of the large time series model.
 
-> **Better Utilization of Lookback Windows**: While Transformer does not necessarily benefit from the larger lookback window, iTransformer exhibits better utilization of the enlargerd lookback window.
+> **Better Utilization of Lookback Windows**: While Transformer does not necessarily benefit from the larger lookback window, iTransformer exhibits better utilization of the enlarged lookback window.
 
 > **Adopt Efficient Attention Modules**: A bundle of efficient attention mechanisms can be applied to reduce the complexity when the number of variates is tremendous.
  
@@ -33,7 +33,7 @@ The repo is the official implementation for the paper: [iTransformer: Inverted T
 <img src="./figures/radar.png" height = "360" alt="" align=center />
 </p>
 
-😊 **iTransformer** is repurposed on the vanilla Transformer. We think the "passionate modification" of Transformer has got too much attention in the research area of time series. We hope the mainstream work in the following can focus on dataset infrastructure and consider the scale-up ability of Transformer.
+😊 **iTransformer** is repurposed on the vanilla Transformer. We think the "passionate modification" of Transformer has got too much attention in the research area of time series. Hopefully, the mainstream work in the following can focus more on the dataset infrastructure and consider the scale-up ability of Transformer.
 
 
 
@@ -43,6 +43,12 @@ iTransformer regards **independent time series as tokens** to **capture multivar
 
 <p align="center">
 <img src="./figures/architecture.png" alt="" align=center />
+</p>
+
+And the pseudo-code of iTransformer is as simple as the following:
+
+<p align="center">
+<img src="./figures/algorithm.png" alt="" align=center />
 </p>
 
 ## Usage 
@@ -58,24 +64,24 @@ pip install -r requirements.txt
 2. Train and evaluate the model. We provide all the above tasks under the folder ./scripts/. You can reproduce the results as the following examples:
 
 ```
-# Multivariate forecasting with iTransformer
+# Task: Multivariate forecasting with iTransformer
 bash ./scripts/multivariate_forecast/Traffic/iTransformer.sh
 
-# Compare the performance of Transformer and iTransformer
+# Task: Compare the performance of Transformer and iTransformer
 bash ./scripts/boost_performance/Weather/iTransformer.sh
 
-# Train with partial variates, and generalize on the unseen variates
+# Task: Train the model with partial variates, and generalize on the unseen variates
 bash ./scripts/variate_generalization/Electricity/iTransformer.sh
 
-# Better performance on increased length of lookback window
+# Task: Test the performance on the enlarged lookback window
 bash ./scripts/increasing_lookback/Traffic/iTransformer.sh
 
-# Utlilize FlashAttention for acceleration(hardware-friendly and computationally equivalent to Transformer)
+# Task: Utilize FlashAttention for acceleration (hardware-friendly and almost computationally equivalent to Transformer)
 bash ./scripts/efficient_attentions/iFlashTransformer.sh
 ```
 
 ## Main Result of Multivariate Forecasting
-We evaluate the iTransformer on six challenging multivariate forecasting benchmarks as well as the server load prediction of Alipay online transaction (**generally hundreds of variates**, denoted as *Dim*).
+We evaluate the iTransformer on six challenging multivariate forecasting benchmarks as well as the server load prediction of Alipay online transactions (**generally hundreds of variates**, denoted as *Dim*). **Consistent least prediction errors** (MSE/MAE) are achieved by iTransformer.
 
 <p align="center">
 <img src="./figures/datasets.png" alt="" align=center />
@@ -95,7 +101,7 @@ We evaluate the iTransformer on six challenging multivariate forecasting benchma
 
 ## General Performance Boosting on Transformers
 
-By introducing the proposed framework, Transformer and its variants achieve **significant performance improvement**, demonstrating the universality of iTransformer framework and the feasibility of **benefiting from efficient attention mechanisms**.
+By introducing the proposed framework, Transformer and its variants achieve **significant performance improvement**, demonstrating the generality of the iTransformer approach and the feasibility of **benefiting from efficient attention mechanisms**.
 
 <p align="center">
 <img src="./figures/boosting.png" alt="" align=center />
@@ -160,10 +166,9 @@ If you find this repo helpful, please cite our paper.
 
 ## Future Work
 
-- [ ] Add timer to test the efficient attention and training strategy.
 - [ ] Open source Alipay Transaction Server Load Dataset.
 - [ ] iTransformer for other time series tasks.
-- [ ] Integrating Transformer variants.
+- [ ] Integrating more Transformer variants.
 
 ## Acknowledgement
 
