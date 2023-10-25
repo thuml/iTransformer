@@ -22,7 +22,7 @@ class Model(nn.Module):
         # Embedding
         self.enc_embedding = DataEmbedding_inverted(configs.seq_len, configs.d_model, configs.embed, configs.freq,
                                                     configs.dropout)
-        # Encoder
+        # Encoder-only architecture
         self.encoder = Encoder(
             [
                 EncoderLayer(
@@ -37,8 +37,7 @@ class Model(nn.Module):
             ],
             norm_layer=torch.nn.LayerNorm(configs.d_model)
         )
-        # Decoder
-        self.projection = nn.Linear(configs.d_model, configs.pred_len, bias=True)
+        self.projector = nn.Linear(configs.d_model, configs.pred_len, bias=True)
 
 
 
@@ -55,7 +54,7 @@ class Model(nn.Module):
         enc_out = self.enc_embedding(x_enc, x_mark_enc)
         enc_out, attns = self.encoder(enc_out, attn_mask=None)
 
-        dec_out = self.projection(enc_out).permute(0, 2, 1)[:, :, :N]
+        dec_out = self.projector(enc_out).permute(0, 2, 1)[:, :, :N]
         # De-Normalization from Non-stationary Transformer
         dec_out = dec_out * (stdev[:, 0, :].unsqueeze(1).repeat(1, self.pred_len, 1))
         dec_out = dec_out + (means[:, 0, :].unsqueeze(1).repeat(1, self.pred_len, 1))
@@ -64,4 +63,3 @@ class Model(nn.Module):
     def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec, mask=None):
         dec_out = self.forecast(x_enc, x_mark_enc, x_dec, x_mark_dec)
         return dec_out[:, -self.pred_len:, :]  # [B, L, D]
-        return None

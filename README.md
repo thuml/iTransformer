@@ -21,7 +21,7 @@ The repo is the official implementation for the paper: [iTransformer: Inverted T
 
 ## Introduction
 
-🌟 Considering the characteristics of time series, iTransformer breaks the conventional model structure without the burden of modifying any Transformer modules. **Inverting Transformer**  is all you need.
+🌟 Considering the characteristics of time series, iTransformer breaks the conventional model structure without the burden of modifying any Transformer modules. **Inverting Transformer**  is all you need in MTSF.
 
 <p align="center">
 <img src="./figures/motivation.png"  alt="" align=center />

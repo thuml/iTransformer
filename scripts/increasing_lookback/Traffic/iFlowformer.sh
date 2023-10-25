@@ -1,12 +1,13 @@
 export CUDA_VISIBLE_DEVICES=0
 
+# model_name=Flowformer
 model_name=iFlowformer
 
 python -u run.py \
   --is_training 1 \
   --root_path ./dataset/traffic/ \
   --data_path traffic.csv \
-  --model_id traffic_96_96 \
+  --model_id traffic_48_96 \
   --model $model_name \
   --data custom \
   --features M \
@@ -54,7 +55,7 @@ python -u run.py \
   --is_training 1 \
   --root_path ./dataset/traffic/ \
   --data_path traffic.csv \
-  --model_id traffic_96_96 \
+  --model_id traffic_192_96 \
   --model $model_name \
   --data custom \
   --features M \
@@ -78,7 +79,7 @@ python -u run.py \
   --is_training 1 \
   --root_path ./dataset/traffic/ \
   --data_path traffic.csv \
-  --model_id traffic_96_96 \
+  --model_id traffic_336_96 \
   --model $model_name \
   --data custom \
   --features M \
@@ -102,7 +103,7 @@ python -u run.py \
   --is_training 1 \
   --root_path ./dataset/traffic/ \
   --data_path traffic.csv \
-  --model_id traffic_96_96 \
+  --model_id traffic_720_96 \
   --model $model_name \
   --data custom \
   --features M \

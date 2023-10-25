@@ -15,6 +15,9 @@ import random
 warnings.filterwarnings('ignore')
 
 
+# train on partial variate data and test on the full variates, used for two types of experiments:
+# (1) Generalize on unseen variate (Figure 5 of our paper)
+# (2) Efficient training strategy  (Figure 8 of our paper)
 class Exp_Long_Term_Forecast_Partial(Exp_Basic):
     def __init__(self, args):
         super(Exp_Long_Term_Forecast_Partial, self).__init__(args)
