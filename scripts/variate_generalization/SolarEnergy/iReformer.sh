@@ -2,6 +2,28 @@ export CUDA_VISIBLE_DEVICES=2
 
 model_name=Reformer
 
+#python -u run.py \
+#  --task_name long_term_forecast \
+#  --is_training 1 \
+#  --root_path ./dataset/Solar/ \
+#  --data_path solar_AL.txt \
+#  --model_id solar_96_96 \
+#  --model $model_name \
+#  --data Solar \
+#  --features M \
+#  --seq_len 96 \
+#  --label_len 48 \
+#  --pred_len 96 \
+#  --e_layers 2 \
+#  --d_layers 1 \
+#  --factor 3 \
+#  --enc_in 137 \
+#  --dec_in 137 \
+#  --c_out 137 \
+#  --des 'Exp' \
+#  --learning_rate 0.0005 \
+#  --itr 1
+
 python -u run.py \
   --task_name long_term_forecast \
   --is_training 1 \
@@ -30,6 +52,28 @@ python -u run.py \
   --itr 1
 
 model_name=iReformer
+
+#python -u run.py \
+#  --task_name long_term_forecast \
+#  --is_training 1 \
+#  --root_path ./dataset/Solar/ \
+#  --data_path solar_AL.txt \
+#  --model_id solar_96_96 \
+#  --model $model_name \
+#  --data Solar \
+#  --features M \
+#  --seq_len 96 \
+#  --label_len 48 \
+#  --pred_len 96 \
+#  --e_layers 2 \
+#  --d_layers 1 \
+#  --factor 3 \
+#  --enc_in 137 \
+#  --dec_in 137 \
+#  --c_out 137 \
+#  --des 'Exp' \
+#  --learning_rate 0.0005 \
+#  --itr
 
 python -u run.py \
   --task_name long_term_forecast \
