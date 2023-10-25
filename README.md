@@ -109,7 +109,7 @@ By introducing the proposed framework, Transformer and its variants achieve **si
 
 ## Generalization on Unseen Variates
 
-Technically, the model can **forecast with a different number of variables** during inference. The results also exhibit that iTransformer **achieves smaller generalization errors** compared with [Channel-independence](https://arxiv.org/pdf/2211.14730.pdf) when only partial variates are used for training.
+**Technically, iTransformer can forecast with arbitray number of variables** during inference. We also dive into the capability, which further exhibit that iTransformer **achieves smaller generalization errors** compared with [Channel-independence](https://arxiv.org/pdf/2211.14730.pdf) when only partial variates are used for training.
 
 <p align="center">
 <img src="./figures/generability.png" alt="" align=center />
