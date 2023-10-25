@@ -21,7 +21,7 @@ python -u run.py \
   --dec_in 172 \
   --c_out 172 \
   --des 'Exp' \
-  --channel_independent true \
+  --channel_independence true \
   --exp_name partial_train \
   --batch_size 8 \
   --d_model 32 \

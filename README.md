@@ -109,7 +109,7 @@ Technically, the model can **forecast with a different number of variables** dur
 <img src="./figures/generability.png" alt="" align=center />
 </p>
 
-## Better Utilization of Model Observations
+## Better Utilization of Lookback Windows
 
 While previous Transformers do not necessarily benefit from the increase of historical observation. iTransformers show a surprising **improvement in forecasting performance with the increasing length of the lookback window**.
 

@@ -93,9 +93,8 @@ if __name__ == '__main__':
     parser.add_argument('--exp_name', type=str, required=False, default='None',
                         help='task name, options:[partial_train, zero_shot]')
 
-    # parser.add_argument('--partial_train', type=bool, default=False, help='partial_train')
-    parser.add_argument('--random_train', type=bool, default=False, help='random_train')
-    parser.add_argument('--channel_independent', type=bool, default=False, help='channel_independent')
+    parser.add_argument('--efficient_training', type=bool, default=False, help='whether to use efficient_training (exp_name should be partial train)')
+    parser.add_argument('--channel_independence', type=bool, default=False, help='whether to use channel_independence mechanism')
     parser.add_argument('--inverse', action='store_true', help='inverse output data', default=False)
     parser.add_argument('--class_strategy', type=str, default='projection', help='projection/average/cls_token')
     parser.add_argument('--target_root_path', type=str, default='./data/ETT/', help='root path of the data file')

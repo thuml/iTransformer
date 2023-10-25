@@ -53,7 +53,7 @@ class Exp_Long_Term_Forecast_Partial(Exp_Basic):
                     batch_x_mark = batch_x_mark.float().to(self.device)
                     batch_y_mark = batch_y_mark.float().to(self.device)
 
-                if partial_train:  # 使用部分变量训练
+                if partial_train:  # we train models with only partial variates from the dataset
                     batch_x = batch_x[:, :, -self.args.enc_in:]
                     batch_y = batch_y[:, :, -self.args.enc_in:]
 
@@ -70,7 +70,7 @@ class Exp_Long_Term_Forecast_Partial(Exp_Basic):
                 else:
                     if self.args.output_attention:
                         outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)[0]
-                    elif self.args.channel_independent:
+                    elif self.args.channel_independence:
                         B, Tx, N = batch_x.shape
                         _, Ty, _ = dec_inp.shape
                         if batch_x_mark == None:
@@ -140,7 +140,9 @@ class Exp_Long_Term_Forecast_Partial(Exp_Basic):
 
                 batch_x = batch_x[:, :, -self.args.enc_in:]
                 batch_y = batch_y[:, :, -self.args.enc_in:]
-                if self.args.random_train:  # 使用随机的部分变量训练
+                # Efficient training strategy: randomly choose part of the variates
+                # and only train the model with selected variates in each batch 
+                if self.args.efficient_training:  
                     _, _, N = batch_x.shape
                     index = np.stack(random.sample(range(N), N))[-self.args.enc_in:]
                     batch_x = batch_x[:, :, index]
@@ -166,7 +168,7 @@ class Exp_Long_Term_Forecast_Partial(Exp_Basic):
                 else:
                     if self.args.output_attention:
                         outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)[0]
-                    elif self.args.channel_independent:
+                    elif self.args.channel_independence:
                         B, Tx, N = batch_x.shape
                         _, Ty, _ = dec_inp.shape
                         if batch_x_mark == None:
@@ -226,6 +228,7 @@ class Exp_Long_Term_Forecast_Partial(Exp_Basic):
         return self.model
 
     def test(self, setting, test=0):
+
         test_data, test_loader = self._get_data(flag='test')
         if test:
             print('loading model')
@@ -263,7 +266,7 @@ class Exp_Long_Term_Forecast_Partial(Exp_Basic):
                 else:
                     if self.args.output_attention:
                         outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)[0]
-                    elif self.args.channel_independent:
+                    elif self.args.channel_independence: # compare the result with channel_independence
                         B, Tx, N = batch_x.shape
                         _, Ty, _ = dec_inp.shape
                         if batch_x_mark == None:
@@ -277,6 +280,7 @@ class Exp_Long_Term_Forecast_Partial(Exp_Basic):
                                                  batch_y_mark.repeat(N, 1, 1)) \
                                 .reshape(B, N, -1).permute(0, 2, 1)
                     else:
+                        # directly test the trained model on all variates without fine-tuning.
                         outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
 
                 f_dim = -1 if self.args.features == 'MS' else 0

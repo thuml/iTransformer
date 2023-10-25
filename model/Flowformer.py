@@ -20,7 +20,7 @@ class Model(nn.Module):
         self.pred_len = configs.pred_len
         self.output_attention = configs.output_attention
 
-        if configs.channel_independent:
+        if configs.channel_independence:
             self.enc_in = 1
             self.dec_in = 1
             self.c_out = 1

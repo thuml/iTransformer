@@ -24,7 +24,7 @@ python -u run.py \
   --d_model 32 \
   --d_ff 64 \
   --learning_rate 0.0005 \
-  --channel_independent true \
+  --channel_independence true \
   --exp_name partial_train \
   --batch_size 8 \
   --itr 1
