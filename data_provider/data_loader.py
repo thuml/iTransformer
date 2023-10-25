@@ -433,6 +433,7 @@ class Dataset_Solar(Dataset):
     def inverse_transform(self, data):
         return self.scaler.inverse_transform(data)
 
+
 class Dataset_M4(Dataset):
     def __init__(self, root_path, flag='pred', size=None,
                  features='S', data_path='ETTh1.csv',
