@@ -5,7 +5,7 @@ model_name=Reformer
 python -u run.py \
   --task_name long_term_forecast \
   --is_training 1 \
-  --root_path /data/Solar/ \
+  --root_path ./dataset/Solar/ \
   --data_path solar_AL.txt \
   --model_id solar_96_96 \
   --model $model_name \
@@ -34,7 +34,7 @@ model_name=iReformer
 python -u run.py \
   --task_name long_term_forecast \
   --is_training 1 \
-  --root_path /data/Solar/ \
+  --root_path ./dataset/Solar/ \
   --data_path solar_AL.txt \
   --model_id solar_96_96 \
   --model $model_name \

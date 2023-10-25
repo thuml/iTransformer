@@ -53,9 +53,9 @@ class Exp_Long_Term_Forecast_Partial(Exp_Basic):
                     batch_x_mark = batch_x_mark.float().to(self.device)
                     batch_y_mark = batch_y_mark.float().to(self.device)
 
-                if partial_train: # 使用部分变量训练
-                    batch_x = batch_x[:,:,-self.args.enc_in:]
-                    batch_y = batch_y[:,:,-self.args.enc_in:]
+                if partial_train:  # 使用部分变量训练
+                    batch_x = batch_x[:, :, -self.args.enc_in:]
+                    batch_y = batch_y[:, :, -self.args.enc_in:]
 
                 # decoder input
                 dec_inp = torch.zeros_like(batch_y[:, -self.args.pred_len:, :]).float()
@@ -72,14 +72,17 @@ class Exp_Long_Term_Forecast_Partial(Exp_Basic):
                         outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)[0]
                     elif self.args.channel_independent:
                         B, Tx, N = batch_x.shape
-                        _, Ty, _ =dec_inp.shape
-                        if batch_x_mark==None:
-                            outputs = self.model(batch_x.permute(0,2,1).reshape(B*N,Tx,1), batch_x_mark,\
-                                                 dec_inp.permute(0,2,1).reshape(B*N,Ty,1), batch_y_mark).reshape(B,N,-1).permute(0,2,1)
+                        _, Ty, _ = dec_inp.shape
+                        if batch_x_mark == None:
+                            outputs = self.model(batch_x.permute(0, 2, 1).reshape(B * N, Tx, 1), batch_x_mark, \
+                                                 dec_inp.permute(0, 2, 1).reshape(B * N, Ty, 1), batch_y_mark).reshape(
+                                B, N, -1).permute(0, 2, 1)
                         else:
-                            outputs = self.model(batch_x.permute(0,2,1).reshape(B*N,Tx,1), batch_x_mark.repeat(N,1,1),\
-                                                 dec_inp.permute(0,2,1).reshape(B*N,Ty,1), batch_y_mark.repeat(N,1,1))\
-                                                .reshape(B,N,-1).permute(0,2,1)
+                            outputs = self.model(batch_x.permute(0, 2, 1).reshape(B * N, Tx, 1),
+                                                 batch_x_mark.repeat(N, 1, 1), \
+                                                 dec_inp.permute(0, 2, 1).reshape(B * N, Ty, 1),
+                                                 batch_y_mark.repeat(N, 1, 1)) \
+                                .reshape(B, N, -1).permute(0, 2, 1)
                     else:
                         outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
                 f_dim = -1 if self.args.features == 'MS' else 0
@@ -135,13 +138,13 @@ class Exp_Long_Term_Forecast_Partial(Exp_Basic):
                     batch_x_mark = batch_x_mark.float().to(self.device)
                     batch_y_mark = batch_y_mark.float().to(self.device)
 
-                batch_x = batch_x[:,:,-self.args.enc_in:]
-                batch_y = batch_y[:,:,-self.args.enc_in:]
-                if self.args.random_train: # 使用随机的部分变量训练
-                    _,_,N = batch_x.shape
-                    index = np.stack(random.sample(range(N),N))[-self.args.enc_in:]
-                    batch_x = batch_x[:,:,index]
-                    batch_y = batch_y[:,:,index]
+                batch_x = batch_x[:, :, -self.args.enc_in:]
+                batch_y = batch_y[:, :, -self.args.enc_in:]
+                if self.args.random_train:  # 使用随机的部分变量训练
+                    _, _, N = batch_x.shape
+                    index = np.stack(random.sample(range(N), N))[-self.args.enc_in:]
+                    batch_x = batch_x[:, :, index]
+                    batch_y = batch_y[:, :, index]
 
                 # decoder input
                 dec_inp = torch.zeros_like(batch_y[:, -self.args.pred_len:, :]).float()
@@ -165,16 +168,19 @@ class Exp_Long_Term_Forecast_Partial(Exp_Basic):
                         outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)[0]
                     elif self.args.channel_independent:
                         B, Tx, N = batch_x.shape
-                        _, Ty, _ =dec_inp.shape
-                        if batch_x_mark==None:
-                            outputs = self.model(batch_x.permute(0,2,1).reshape(B*N,Tx,1), batch_x_mark,\
-                                                 dec_inp.permute(0,2,1).reshape(B*N,Ty,1), batch_y_mark).reshape(B,N,-1).permute(0,2,1)
+                        _, Ty, _ = dec_inp.shape
+                        if batch_x_mark == None:
+                            outputs = self.model(batch_x.permute(0, 2, 1).reshape(B * N, Tx, 1), batch_x_mark, \
+                                                 dec_inp.permute(0, 2, 1).reshape(B * N, Ty, 1), batch_y_mark).reshape(
+                                B, N, -1).permute(0, 2, 1)
                         else:
-                            a = batch_x.permute(0,2,1)
-                            b = batch_x.permute(0,2,1).reshape(B*N,Tx,1)
-                            outputs = self.model(batch_x.permute(0,2,1).reshape(B*N,Tx,1), batch_x_mark.repeat(N,1,1),\
-                                                 dec_inp.permute(0,2,1).reshape(B*N,Ty,1), batch_y_mark.repeat(N,1,1))\
-                                                .reshape(B,N,-1).permute(0,2,1)
+                            a = batch_x.permute(0, 2, 1)
+                            b = batch_x.permute(0, 2, 1).reshape(B * N, Tx, 1)
+                            outputs = self.model(batch_x.permute(0, 2, 1).reshape(B * N, Tx, 1),
+                                                 batch_x_mark.repeat(N, 1, 1), \
+                                                 dec_inp.permute(0, 2, 1).reshape(B * N, Ty, 1),
+                                                 batch_y_mark.repeat(N, 1, 1)) \
+                                .reshape(B, N, -1).permute(0, 2, 1)
                     else:
                         outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
 
@@ -259,14 +265,17 @@ class Exp_Long_Term_Forecast_Partial(Exp_Basic):
                         outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)[0]
                     elif self.args.channel_independent:
                         B, Tx, N = batch_x.shape
-                        _, Ty, _ =dec_inp.shape
-                        if batch_x_mark==None:
-                            outputs = self.model(batch_x.permute(0,2,1).reshape(B*N,Tx,1), batch_x_mark,\
-                                                 dec_inp.permute(0,2,1).reshape(B*N,Ty,1), batch_y_mark).reshape(B,N,-1).permute(0,2,1)
+                        _, Ty, _ = dec_inp.shape
+                        if batch_x_mark == None:
+                            outputs = self.model(batch_x.permute(0, 2, 1).reshape(B * N, Tx, 1), batch_x_mark, \
+                                                 dec_inp.permute(0, 2, 1).reshape(B * N, Ty, 1), batch_y_mark).reshape(
+                                B, N, -1).permute(0, 2, 1)
                         else:
-                            outputs = self.model(batch_x.permute(0,2,1).reshape(B*N,Tx,1), batch_x_mark.repeat(N,1,1),\
-                                                 dec_inp.permute(0,2,1).reshape(B*N,Ty,1), batch_y_mark.repeat(N,1,1))\
-                                                .reshape(B,N,-1).permute(0,2,1)
+                            outputs = self.model(batch_x.permute(0, 2, 1).reshape(B * N, Tx, 1),
+                                                 batch_x_mark.repeat(N, 1, 1), \
+                                                 dec_inp.permute(0, 2, 1).reshape(B * N, Ty, 1),
+                                                 batch_y_mark.repeat(N, 1, 1)) \
+                                .reshape(B, N, -1).permute(0, 2, 1)
                     else:
                         outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
 
@@ -285,7 +294,7 @@ class Exp_Long_Term_Forecast_Partial(Exp_Basic):
                 preds.append(pred)
                 trues.append(true)
                 if i % 20 == 0:
-                # if i == 4440:
+                    # if i == 4440:
                     input = batch_x.detach().cpu().numpy()
                     gt = np.concatenate((input[0, :, -1], true[0, :, -1]), axis=0)
                     pd = np.concatenate((input[0, :, -1], pred[0, :, -1]), axis=0)

@@ -31,7 +31,6 @@ class Model(nn.Module):
             self.dec_in = configs.dec_in
             self.c_out = configs.c_out
 
-
         self.enc_embedding = DataEmbedding(self.enc_in, configs.d_model, configs.embed, configs.freq,
                                            configs.dropout)
         # Encoder
@@ -91,7 +90,7 @@ class Model(nn.Module):
         enc_out = self.enc_embedding(x_enc, x_mark_enc)  # [B,T,C]
         enc_out, attns = self.encoder(enc_out, attn_mask=None)
         return enc_out
-    
+
     def short_forecast(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
         # Normalization
         mean_enc = x_enc.mean(1, keepdim=True).detach()  # B x 1 x E

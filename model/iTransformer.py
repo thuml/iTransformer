@@ -128,7 +128,8 @@ class Model(nn.Module):
         elif self.class_strategy == 'cls_token':
             # Embedding
             enc_out = self.enc_embedding(x_enc, None)
-            enc_out = torch.cat((self.cls_token.expand(enc_out.shape[0], -1, -1), enc_out), dim=1) #  (batch_size, N + 1, d_model)
+            enc_out = torch.cat((self.cls_token.expand(enc_out.shape[0], -1, -1), enc_out),
+                                dim=1)  # (batch_size, N + 1, d_model)
             enc_out, attns = self.encoder(enc_out, attn_mask=None)
 
             # Output
@@ -137,7 +138,7 @@ class Model(nn.Module):
             output = output[:, 0, :]  # (batch_size, d_model)
             output = self.projection(output)  # (batch_size, num_classes)
             return output
-        else: # projection
+        else:  # projection
             # Embedding
             enc_out = self.enc_embedding(x_enc, None)
             enc_out, attns = self.encoder(enc_out, attn_mask=None)
