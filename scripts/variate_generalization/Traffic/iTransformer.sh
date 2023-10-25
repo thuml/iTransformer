@@ -3,8 +3,7 @@ export CUDA_VISIBLE_DEVICES=3
 model_name=Transformer
 
 #python -u run.py \
-#  --task_name long_term_forecast \
-#  --is_training 1 \
+##  --is_training 1 \
 #  --root_path ./dataset/traffic/ \
 #  --data_path traffic.csv \
 #  --model_id traffic_96_96 \
@@ -24,7 +23,6 @@ model_name=Transformer
 #  --itr 1
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/traffic/ \
   --data_path traffic.csv \
@@ -52,8 +50,7 @@ python -u run.py \
 model_name=iTransformer
 
 #python -u run.py \
-#  --task_name long_term_forecast \
-#  --is_training 1 \
+##  --is_training 1 \
 #  --root_path ./dataset/traffic/ \
 #  --data_path traffic.csv \
 #  --model_id traffic_96_96 \
@@ -73,7 +70,6 @@ model_name=iTransformer
 #  --itr 1
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/traffic/ \
   --data_path traffic.csv \

@@ -3,7 +3,6 @@ export CUDA_VISIBLE_DEVICES=2
 model_name=Informer
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/weather/ \
   --data_path weather.csv \
@@ -26,7 +25,6 @@ python -u run.py \
   --train_epochs 3
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/weather/ \
   --data_path weather.csv \
@@ -48,7 +46,6 @@ python -u run.py \
   --itr 1
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/weather/ \
   --data_path weather.csv \
@@ -70,7 +67,6 @@ python -u run.py \
   --itr 1
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/weather/ \
   --data_path weather.csv \
@@ -94,7 +90,6 @@ python -u run.py \
 model_name=iInformer
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/weather/ \
   --data_path weather.csv \
@@ -117,7 +112,6 @@ python -u run.py \
   --train_epochs 3
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/weather/ \
   --data_path weather.csv \
@@ -139,7 +133,6 @@ python -u run.py \
   --itr 1
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/weather/ \
   --data_path weather.csv \
@@ -161,7 +154,6 @@ python -u run.py \
   --itr 1
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/weather/ \
   --data_path weather.csv \

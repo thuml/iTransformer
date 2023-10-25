@@ -14,8 +14,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='TimesNet')
 
     # basic config
-    parser.add_argument('--task_name', type=str, required=True, default='long_term_forecast',
-                        help='task name, options:[long_term_forecast, short_term_forecast, imputation, classification, anomaly_detection]')
     parser.add_argument('--is_training', type=int, required=True, default=1, help='status')
     parser.add_argument('--model_id', type=str, required=True, default='test', help='model id')
     parser.add_argument('--model', type=str, required=True, default='Autoformer',
@@ -112,19 +110,16 @@ if __name__ == '__main__':
     print('Args in experiment:')
     print(args)
 
-    if args.task_name == 'long_term_forecast':
-        if args.exp_name == 'partial_train':
-            Exp = Exp_Long_Term_Forecast_Partial
-        else:
-            Exp = Exp_Long_Term_Forecast
+    if args.exp_name == 'partial_train':
+        Exp = Exp_Long_Term_Forecast_Partial
     else:
         Exp = Exp_Long_Term_Forecast
+
 
     if args.is_training:
         for ii in range(args.itr):
             # setting record of experiments
             setting = '{}_{}_{}_{}_ft{}_sl{}_ll{}_pl{}_dm{}_nh{}_el{}_dl{}_df{}_fc{}_eb{}_dt{}_{}_{}'.format(
-                args.task_name,
                 args.model_id,
                 args.model,
                 args.data,
@@ -153,7 +148,6 @@ if __name__ == '__main__':
     else:
         ii = 0
         setting = '{}_{}_{}_{}_ft{}_sl{}_ll{}_pl{}_dm{}_nh{}_el{}_dl{}_df{}_fc{}_eb{}_dt{}_{}_{}'.format(
-            args.task_name,
             args.model_id,
             args.model,
             args.data,

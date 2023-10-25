@@ -3,7 +3,6 @@ export CUDA_VISIBLE_DEVICES=2
 model_name=Flashformer
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/traffic/ \
   --data_path traffic.csv \
@@ -25,7 +24,6 @@ python -u run.py \
   --train_epochs 3
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/traffic/ \
   --data_path traffic.csv \
@@ -47,7 +45,6 @@ python -u run.py \
   --train_epochs 3
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/traffic/ \
   --data_path traffic.csv \
@@ -69,7 +66,6 @@ python -u run.py \
   --train_epochs 3
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/traffic/ \
   --data_path traffic.csv \
@@ -93,7 +89,6 @@ python -u run.py \
 model_name=iFlashformer
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/traffic/ \
   --data_path traffic.csv \
@@ -115,7 +110,6 @@ python -u run.py \
   --train_epochs 3
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/traffic/ \
   --data_path traffic.csv \
@@ -137,7 +131,6 @@ python -u run.py \
   --train_epochs 3
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/traffic/ \
   --data_path traffic.csv \
@@ -159,7 +152,6 @@ python -u run.py \
   --train_epochs 3
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/traffic/ \
   --data_path traffic.csv \

@@ -3,7 +3,6 @@ export CUDA_VISIBLE_DEVICES=1
 model_name=Reformer
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/traffic/ \
   --data_path traffic.csv \
@@ -25,7 +24,6 @@ python -u run.py \
   --train_epochs 3
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/traffic/ \
   --data_path traffic.csv \
@@ -47,7 +45,6 @@ python -u run.py \
   --train_epochs 3
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/traffic/ \
   --data_path traffic.csv \
@@ -69,7 +66,6 @@ python -u run.py \
   --train_epochs 3
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/traffic/ \
   --data_path traffic.csv \
@@ -94,7 +90,6 @@ python -u run.py \
 model_name=iReformer
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/traffic/ \
   --data_path traffic.csv \
@@ -116,7 +111,6 @@ python -u run.py \
   --train_epochs 3
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/traffic/ \
   --data_path traffic.csv \
@@ -138,7 +132,6 @@ python -u run.py \
   --train_epochs 3
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/traffic/ \
   --data_path traffic.csv \
@@ -160,7 +153,6 @@ python -u run.py \
   --train_epochs 3
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/traffic/ \
   --data_path traffic.csv \

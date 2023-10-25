@@ -3,7 +3,6 @@ export CUDA_VISIBLE_DEVICES=1
 model_name=iTransformer
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/PEMS/ \
   --data_path PEMS03.npz \
@@ -27,7 +26,6 @@ python -u run.py \
   --itr 1
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/PEMS/ \
   --data_path PEMS03.npz \
@@ -52,7 +50,6 @@ python -u run.py \
 
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/PEMS/ \
   --data_path PEMS03.npz \
@@ -77,7 +74,6 @@ python -u run.py \
 
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/PEMS/ \
   --data_path PEMS03.npz \

@@ -3,8 +3,7 @@ export CUDA_VISIBLE_DEVICES=0
 model_name=Flowformer
 
 #python -u run.py \
-#  --task_name long_term_forecast \
-#  --is_training 1 \
+##  --is_training 1 \
 #  --root_path ./dataset/Solar/ \
 #  --data_path solar_AL.txt \
 #  --model_id solar_96_96 \
@@ -25,7 +24,6 @@ model_name=Flowformer
 #  --itr 1
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/Solar/ \
   --data_path solar_AL.txt \
@@ -54,8 +52,7 @@ python -u run.py \
 model_name=iFlowformer
 
 #python -u run.py \
-#  --task_name long_term_forecast \
-#  --is_training 1 \
+##  --is_training 1 \
 #  --root_path ./dataset/Solar/ \
 #  --data_path solar_AL.txt \
 #  --model_id solar_96_96 \
@@ -76,7 +73,6 @@ model_name=iFlowformer
 #  --itr 1
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/Solar/ \
   --data_path solar_AL.txt \

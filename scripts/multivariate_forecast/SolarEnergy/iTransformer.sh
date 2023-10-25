@@ -3,7 +3,6 @@ export CUDA_VISIBLE_DEVICES=1
 model_name=iTransformer
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/Solar/ \
   --data_path solar_AL.txt \
@@ -27,7 +26,6 @@ python -u run.py \
   --itr 1
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/Solar/ \
   --data_path solar_AL.txt \
@@ -51,7 +49,6 @@ python -u run.py \
   --itr 1
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/Solar/ \
   --data_path solar_AL.txt \
@@ -75,7 +72,6 @@ python -u run.py \
   --itr 1
 
 python -u run.py \
-  --task_name long_term_forecast \
   --is_training 1 \
   --root_path ./dataset/Solar/ \
   --data_path solar_AL.txt \
