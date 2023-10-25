@@ -6,11 +6,11 @@ The repo is the official implementation of "iTransformer: Inverted Transformers 
 
 > **Boosting Forecasting Performance of Transformers**: We are continuously incorporating Transformer variants. If you are interested in how well your inverted Transformer works for forecasting tasks, feel free to raise issues.
 
-> **Generalization on Unseen Variates**: iTransformer is demostrated to generalize well on unseen time series, making it a nice alternative as the fundamental backbone of large time series model.
+> **Generalization on Unseen Variates**: iTransformer is demonstrated to generalize well on unseen time series, making it a nice alternative as the fundamental backbone of the large time series model.
 
-> **Better Utilization of Lookback Windows**: While Transformer do not necessarily benefit from the larger lookback window, iTransformer exhibits better utilization of enlargerd lookback window.
+> **Better Utilization of Lookback Windows**: While Transformer does not necessarily benefit from the larger lookback window, iTransformer exhibits better utilization of the enlargerd lookback window.
 
-> **Adopt Efficienting Attention Modules**: A bundle of efficient attention mechanisms can be applied to reduce the complexity when the number of variates is tremendous.
+> **Adopt Efficient Attention Modules**: A bundle of efficient attention mechanisms can be applied to reduce the complexity when the number of variates is tremendous.
  
 # Updates
 
@@ -20,12 +20,6 @@ The repo is the official implementation of "iTransformer: Inverted Transformers 
 
 
 ## Introduction
-
-
-
-
-
-
 
 🌟 Considering the characteristics of time series, iTransformer breaks the conventional model structure without the burden of modifying any Transformer modules. **Inverting the Transformer**  is all you need.
 
@@ -39,13 +33,13 @@ The repo is the official implementation of "iTransformer: Inverted Transformers 
 <img src="./figures/radar.png" height = "360" alt="" align=center />
 </p>
 
-😊 **iTransformer** is repurposed on the vanilla Transformer. We think the "passionate modification" on Transformer has got too much attention on the research area of time series. We hope the mainstream work in the following can focus on dataset infrastructure and consider the scale-up ability of Transformer.
+😊 **iTransformer** is repurposed on the vanilla Transformer. We think the "passionate modification" of Transformer has got too much attention in the research area of time series. We hope the mainstream work in the following can focus on dataset infrastructure and consider the scale-up ability of Transformer.
 
 
 
 ## Overall Architecture
 
-iTransformer regards independent time series as tokens to capture multivariate correlations by attention and utilize layernorm and feed-forward network to learn better representations for forecasting.
+iTransformer regards independent time series as tokens to capture multivariate correlations by attention and utilize layernorm and feed-forward networks to learn better representations for forecasting.
 
 <p align="center">
 <img src="./figures/architecture.png" alt="" align=center />
@@ -81,7 +75,7 @@ bash ./scripts/efficient_attentions/iFlashTransformer.sh
 ```
 
 ## Main Result of Multivariate Forecasting
-We evaluate the iTransformer on six challenging multivariate forecasting benchmarks and the server load of Alipay online transaction prediction (generally hundreds of variates).
+We evaluate the iTransformer on six challenging multivariate forecasting benchmarks and the server load of Alipay online transaction prediction (**generally hundreds of variates**, denoted as *Dim*).
 
 <p align="center">
 <img src="./figures/datasets.png" alt="" align=center />
@@ -101,7 +95,7 @@ We evaluate the iTransformer on six challenging multivariate forecasting benchma
 
 ## General Performance Boosting on Transformers
 
-By introducing the proposed framework, Transformer and its variants achieve significant performance improvement, demonstrating the universality of iTransformer framework and the feasibility of benefiting from efficient attention mechanisms.
+By introducing the proposed framework, Transformer and its variants achieve **significant performance improvement**, demonstrating the universality of iTransformer framework and the feasibility of **benefiting from efficient attention mechanisms**.
 
 <p align="center">
 <img src="./figures/boosting.png" alt="" align=center />
@@ -109,34 +103,33 @@ By introducing the proposed framework, Transformer and its variants achieve sign
 
 ## Generalization on Unseen Variates
 
-By inverting, the model can forecast with different number of variables during inference. The results show that the framework can minimize the generalization error when only 20% of the variables are used.
+Technically, the model can **forecast with a different number of variables** during inference. The results also exhibit that the model can **achieve small generalization errors** when only partial variates are used for training.
 
 <p align="center">
-<img src="./figures/generability.png" alt="" align=center /> # TODO: Update the New One
+<img src="./figures/generability.png" alt="" align=center />
 </p>
 
 ## Better Utilization of Model Observations
-While previous Transformer architecture does not necessarily bebefit from the increase of historical observation. iTransformer model shows a surprising improvement of forecasting performance with the increasing length of lookback window.
+While previous Transformer architecture does not necessarily benefit from the increase of historical observation. iTransformers show a surprising **improvement in forecasting performance with the increasing length of the lookback window**.
 
 <p align="center">
 <img src="./figures/increase_lookback.png" alt="" align=center />
 </p>
 
-## Model Abalations
-
-iTransformer that utilizes attention on variate dimension and feed-forward on temporal dimension generally achieves the best performance. Notably, the performance of vanilla Transformer (the third row) performs the worst among these designs, indicating the disaccord of responsibility when the conventional architecture is adopted.
-
-<p align="center">
-<img src="./figures/ablations.png" alt="" align=center />
-</p>
-
 ## Model Analysis
-We conduct model analysis to validate that:
-1. Transformer learns better sequence features (more similar CKA) for better prediction.
-2. The self-attention module learns more interptetable multivariate correlations.
+1. Inverted Transformers learn better features (more similar [CKA](https://github.com/jayroxis/CKA-similarity)) favored by time series forecasting.
+2. The inverted self-attention module learns interpretable multivariate correlations.
 
 <p align="center">
 <img src="./figures/analysis.png" alt="" align=center />
+</p>
+
+## Model Abalations
+
+iTransformer that utilizes attention on variate dimensions and feed-forward on temporal dimension generally achieves the best performance. However, the performance of vanilla Transformer (the third row) performs the worst among these designs, indicating the disaccord of responsibility when the conventional architecture is adopted.
+
+<p align="center">
+<img src="./figures/ablations.png" alt="" align=center />
 </p>
 
 ## Citation
@@ -151,6 +144,11 @@ If you find this repo useful, please cite our paper.
   year={2023}
 }
 ```
+
+## Future Work
+- [ ] Open source Alipay Transaction Server Load Dataset.
+- [ ] iTransformer for other time series tasks.
+- [ ] Integrating Transformer variants.
 
 ## Contact
 
