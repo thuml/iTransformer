@@ -1,6 +1,6 @@
 # iTransformer
 
-The repo is the official implementation for the paper: [iTransformer: Inverted Transformers Are Effective for Time Series Forecasting](https://arxiv.org/abs/2305.18803). It currently includes code implementations for the following tasks:
+The repo is the official implementation for the paper: [https://arxiv.org/abs/2310.06625). It currently includes code implementations for the following tasks:
 
 > **Multivariate Forecasting**: We provide all scripts as well as datasets for the reproduction of forecasting results in this repo.
 
@@ -14,7 +14,7 @@ The repo is the official implementation for the paper: [iTransformer: Inverted T
  
 # Updates
 
-:triangular_flag_on_post: **News** (2023.10) All the scripts for the above tasks in our [paper](https://arxiv.org/pdf/2305.18803.pdf) are available in this repo.
+:triangular_flag_on_post: **News** (2023.10) All the scripts for the above tasks in our [paper](https://arxiv.org/pdf/2310.06625.pdf) are available in this repo.
 
 :triangular_flag_on_post: **News** (2023.10) iTransformer has been included in [[Time-Series-Library]](https://github.com/thuml/Time-Series-Library) and achieve the consistent state-of-the-art in long-term time series forecasting.
 
