@@ -166,7 +166,6 @@ If you find this repo helpful, please cite our paper.
 
 ## Future Work
 
-- [ ] Open source Alipay Transaction Server Load Dataset.
 - [ ] iTransformer for other time series tasks.
 - [ ] Integrating more Transformer variants.
 
