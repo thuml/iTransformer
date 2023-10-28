@@ -39,7 +39,7 @@ The repo is the official implementation for the paper: [iTransformer: Inverted T
 
 ## Overall Architecture
 
-iTransformer regards **independent time series as tokens** to **capture multivariate correlations by attention** and **utilize layernorm and feed-forward networks to learn better representations** for forecasting.
+iTransformer regards **independent time series as tokens** to **capture multivariate correlations by attention** and **utilize layernorm and feed-forward networks to learn better series representations**.
 
 <p align="center">
 <img src="./figures/architecture.png" alt="" align=center />
@@ -168,6 +168,7 @@ If you find this repo helpful, please cite our paper.
 
 - [ ] iTransformer for other time series tasks.
 - [ ] Integrating more Transformer variants.
+- [ ] iTransformer Scalability.
 
 ## Acknowledgement
 
