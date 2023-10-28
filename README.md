@@ -10,7 +10,7 @@ The repo is the official implementation for the paper: [iTransformer: Inverted T
 
 > **Better Utilization of Lookback Windows**: While Transformer does not necessarily benefit from the larger lookback window, iTransformer exhibits better utilization of the enlarged lookback window.
 
-> **Adopt Efficient Attention Modules**: A bundle of efficient attention mechanisms can be applied to reduce the complexity when the number of variates is tremendous.
+> **Adopt Efficient Attention and Train Strategy**: Efficient attention mechanisms as well as the feasibility of extrapolating variates can be leveraged to reduce the complexity when the number of variates is tremendous.
  
 # Updates
 
