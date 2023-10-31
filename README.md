@@ -21,7 +21,7 @@ The repo is the official implementation for the paper: [iTransformer: Inverted T
 
 ## Introduction
 
-🌟 Considering the characteristics of time series, iTransformer breaks the conventional model structure without the burden of modifying any Transformer modules. **Inverting Transformer**  is all you need in MTSF.
+🌟 Considering the characteristics of time series, iTransformer breaks the conventional model structure without the burden of modifying any Transformer modules. **Inverting Transformer is all you need in MTSF**.
 
 <p align="center">
 <img src="./figures/motivation.png"  alt="" align=center />
@@ -39,7 +39,7 @@ The repo is the official implementation for the paper: [iTransformer: Inverted T
 
 ## Overall Architecture
 
-iTransformer regards **independent time series as tokens** to **capture multivariate correlations by attention** and **utilize layernorm and feed-forward networks to learn better series representations**.
+iTransformer regards **independent time series as variate tokens** to **capture multivariate correlations by attention** and **utilize layernorm and feed-forward networks to learn better series representations**.
 
 <p align="center">
 <img src="./figures/architecture.png" alt="" align=center />
