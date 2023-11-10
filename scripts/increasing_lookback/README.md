@@ -19,3 +19,5 @@ You can change the ```model_name``` in the script to switch the selection of the
 <p align="center">
 <img src="../../figures/increase_lookback.png" alt="" align=center />
 </p>
+
+The inverted framework empowers Transformers with improved performance on the enlarged lookback window.

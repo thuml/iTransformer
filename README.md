@@ -4,7 +4,7 @@ The repo is the official implementation for the paper: [iTransformer: Inverted T
 
 > **Multivariate Forecasting**: We provide all scripts as well as datasets for the reproduction of forecasting results in this repo.
 
-> **Boosting Forecasting of Transformers**: We are continuously incorporating Transformer variants. If you are interested in how well your inverted Transformer works for forecasting tasks, feel free to raise issues.
+> **Boosting Forecasting of Transformers**: We are continuously incorporating Transformer variants. If you are interested in how well other Transformer variants work for forecasting tasks, feel free to contact us.
 
 > **Generalization on Unseen Variates**: iTransformer is demonstrated to generalize well on unseen time series, making it a nice alternative as the fundamental backbone of the large time series model.
 

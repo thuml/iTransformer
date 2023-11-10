@@ -4,7 +4,7 @@ This folder contains the comparison of the vanilla Transformer-based forecasters
 
 ## Scripts
 
-In each folder named after the dataset, we provide the iTransformers and the vanilla Transformers experiments.
+In each folder named after the dataset, we compare the performance of iTransformers and the vanilla Transformers.
 
 ```
 # iTransformer on the Traffic Dataset with gradually enlarged lookback windows.
@@ -12,7 +12,7 @@ In each folder named after the dataset, we provide the iTransformers and the van
 bash ./scripts/boost_performance/Traffic/iTransformer.sh
 ```
 
-You can change the ```model_name``` in the script to switch the selection of the vanilla Transformer and inverted version.
+You can change the ```model_name``` in the script to select one Transformer variant and its inverted version.
 
 ## Results
 

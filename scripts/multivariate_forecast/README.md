@@ -44,13 +44,13 @@ python -u run.py \
   --d_ff 512 \
   --batch_size 16 \
   --learning_rate 0.0005 \
-  --itr 1 \
+  --itr 1
 ```
 
 
 ## Training on Custom Dataset
 
-To train with your own time series dataset, there are the steps to follow to make this work:
+To train with your own time series dataset, you can try out the following steps:
 
 1. Read through the ```Dataset_Custom``` class under the ```data_provider/data_loader``` folder, which provides the functionality to load and process time series files.
 2. The file should be ```csv``` format with the first column contains the timestamp and the following columns contain the variates of time series.

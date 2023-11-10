@@ -141,11 +141,14 @@ class Exp_Long_Term_Forecast_Partial(Exp_Basic):
                     batch_x_mark = batch_x_mark.float().to(self.device)
                     batch_y_mark = batch_y_mark.float().to(self.device)
 
+                # Variate Generalization training: 
+                # We train with partial variates (args.enc_in < number of dataset variates)
+                # and test the obtained model directly on all variates.
                 batch_x = batch_x[:, :, -self.args.enc_in:]
                 batch_y = batch_y[:, :, -self.args.enc_in:]
                 # Efficient training strategy: randomly choose part of the variates
                 # and only train the model with selected variates in each batch 
-                if self.args.efficient_training:  
+                if self.args.efficient_training:
                     _, _, N = batch_x.shape
                     index = np.stack(random.sample(range(N), N))[-self.args.enc_in:]
                     batch_x = batch_x[:, :, index]
@@ -246,6 +249,7 @@ class Exp_Long_Term_Forecast_Partial(Exp_Basic):
         self.model.eval()
         with torch.no_grad():
             for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(test_loader):
+                # During model inference, test the obtained model directly on all variates.
                 batch_x = batch_x.float().to(self.device)
                 batch_y = batch_y.float().to(self.device)
 
