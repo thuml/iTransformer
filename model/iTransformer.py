@@ -39,8 +39,6 @@ class Model(nn.Module):
         self.projector = nn.Linear(configs.d_model, configs.pred_len, bias=True)
 
     def forecast(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
-        s, t = decomp(x_enc)
-        
         # Normalization from Non-stationary Transformer
         means = x_enc.mean(1, keepdim=True).detach()
         x_enc = x_enc - means
@@ -51,9 +49,6 @@ class Model(nn.Module):
         # B: batch_size;    E: d_model; 
         # L: seq_len;       S: pred_len;
         # N: number of variate (tokens), can also includes covariates
-
-       
-
 
         # Embedding
         # B L N -> B N E                (B L N -> B L E in the vanilla Transformer)
