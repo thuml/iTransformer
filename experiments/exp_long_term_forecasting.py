@@ -273,3 +273,52 @@ class Exp_Long_Term_Forecast(Exp_Basic):
         np.save(folder_path + 'true.npy', trues)
 
         return
+
+
+    def predict(self, setting, load=False):
+        pred_data, pred_loader = self._get_data(flag='pred')
+
+        if load:
+            path = os.path.join(self.args.checkpoints, setting)
+            best_model_path = path + '/' + 'checkpoint.pth'
+            self.model.load_state_dict(torch.load(best_model_path))
+
+        preds = []
+
+        self.model.eval()
+        with torch.no_grad():
+            for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(pred_loader):
+                batch_x = batch_x.float().to(self.device)
+                batch_y = batch_y.float()
+                batch_x_mark = batch_x_mark.float().to(self.device)
+                batch_y_mark = batch_y_mark.float().to(self.device)
+
+                # decoder input
+                dec_inp = torch.zeros_like(batch_y[:, -self.args.pred_len:, :]).float()
+                dec_inp = torch.cat([batch_y[:, :self.args.label_len, :], dec_inp], dim=1).float().to(self.device)
+                # encoder - decoder
+                if self.args.use_amp:
+                    with torch.cuda.amp.autocast():
+                        if self.args.output_attention:
+                            outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)[0]
+                        else:
+                            outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
+                else:
+                    if self.args.output_attention:
+                        outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)[0]
+                    else:
+                        outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
+                pred = outputs.detach().cpu().numpy()  # .squeeze()
+                preds.append(pred)
+
+        preds = np.array(preds)
+        preds = preds.reshape(-1, preds.shape[-2], preds.shape[-1])
+
+        # result save
+        folder_path = './results/' + setting + '/'
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+
+        np.save(folder_path + 'real_prediction.npy', preds)
+
+        return
