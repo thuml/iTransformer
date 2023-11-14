@@ -76,7 +76,7 @@ if __name__ == '__main__':
 
     # iTransformer
     parser.add_argument('--exp_name', type=str, required=False, default='MTSF',
-                        help='experiemnt name, options:['MTSF', 'partial_train']')  
+                        help='experiemnt name, options:[MTSF, partial_train]')
     parser.add_argument('--channel_independence', type=bool, default=False, help='whether to use channel_independence mechanism')
     parser.add_argument('--inverse', action='store_true', help='inverse output data', default=False)
     parser.add_argument('--class_strategy', type=str, default='projection', help='projection/average/cls_token')
