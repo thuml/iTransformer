@@ -10,9 +10,11 @@ The repo is the official implementation for the paper: [iTransformer: Inverted T
 
 > **Better Utilization of Lookback Windows**: While Transformer does not necessarily benefit from the larger lookback window, iTransformer exhibits better utilization of the enlarged lookback window.
 
-> **Adopt Efficient Attention and Training Strategy**: Efficient attention mechanisms as well as the feasibility of extrapolating variates can be leveraged to reduce the complexity when the number of variates is tremendous.
+> **Adopt Efficient Attention and Training Strategy**: Efficient attentions and the feasibility of training on arbitrary number of variates can be leveraged to reduce the complexity when the number of variates is tremendous.
  
 # Updates
+
+:triangular_flag_on_post: **News** (2023.11) We receive lots of valuable suggestions during rebuttal. A [revised version](https://arxiv.org/pdf/2310.06625.pdf) is available, which contains more solid experiments and intuitive cases to support the peculiarities of our work.
 
 :triangular_flag_on_post: **News** (2023.10) All the scripts for the above tasks in our [paper](https://arxiv.org/pdf/2310.06625.pdf) are available in this repo.
 
@@ -39,13 +41,13 @@ The repo is the official implementation for the paper: [iTransformer: Inverted T
 
 ## Overall Architecture
 
-iTransformer regards **independent time series as variate tokens** to **capture multivariate correlations by attention** and **utilize layernorm and feed-forward networks to learn better series representations**.
+iTransformer regards **independent time series as variate tokens** to **capture multivariate correlations by attention** and **utilize layernorm and feed-forward networks to learn series representations**.
 
 <p align="center">
 <img src="./figures/architecture.png" alt="" align=center />
 </p>
 
-And the pseudo-code of iTransformer is as simple as the following:
+The pseudo-code of iTransformer is as simple as the following:
 
 <p align="center">
 <img src="./figures/algorithm.png" alt="" align=center />
@@ -53,7 +55,7 @@ And the pseudo-code of iTransformer is as simple as the following:
 
 ## Usage 
 
-1. Install Pytorch and other necessary dependencies.
+1. Install Pytorch and necessary dependencies.
 
 ```
 pip install -r requirements.txt
@@ -64,24 +66,24 @@ pip install -r requirements.txt
 2. Train and evaluate the model. We provide all the above tasks under the folder ./scripts/. You can reproduce the results as the following examples:
 
 ```
-# Task: Multivariate forecasting with iTransformer
+# Multivariate forecasting with iTransformer
 bash ./scripts/multivariate_forecast/Traffic/iTransformer.sh
 
-# Task: Compare the performance of Transformer and iTransformer
+# Compare the performance of Transformer and iTransformer
 bash ./scripts/boost_performance/Weather/iTransformer.sh
 
-# Task: Train the model with partial variates, and generalize on the unseen variates
+# Train the model with partial variates, and generalize on the unseen variates
 bash ./scripts/variate_generalization/Electricity/iTransformer.sh
 
-# Task: Test the performance on the enlarged lookback window
+# Test the performance on the enlarged lookback window
 bash ./scripts/increasing_lookback/Traffic/iTransformer.sh
 
-# Task: Utilize FlashAttention for acceleration (hardware-friendly and almost computationally equivalent to Transformer)
+# Utilize FlashAttention for acceleration
 bash ./scripts/efficient_attentions/iFlashTransformer.sh
 ```
 
 ## Main Result of Multivariate Forecasting
-We evaluate the iTransformer on six challenging multivariate forecasting benchmarks as well as the server load prediction of Alipay online transactions (**generally hundreds of variates**, denoted as *Dim*). **Consistent least prediction errors** (MSE/MAE) are achieved by iTransformer.
+We evaluate the iTransformer on extensive challenging multivariate forecasting benchmarks as well as the server load prediction of Alipay online transactions (**generally hundreds of variates**, denoted as *Dim*). **Comprehensive good performance** (MSE/MAE) are achieved by iTransformer. Especially, iTransformer is particularly good at forecasting high-dimensional time series.
 
 <p align="center">
 <img src="./figures/datasets.png" alt="" align=center />
@@ -93,6 +95,8 @@ We evaluate the iTransformer on six challenging multivariate forecasting benchma
 <img src="./figures/main_results.png" alt="" align=center />
 </p>
 
+
+
 ### Online Transaction Load Prediction of Alipay Trading Platform (Avg Results) 
 
 <p align="center">
@@ -101,7 +105,7 @@ We evaluate the iTransformer on six challenging multivariate forecasting benchma
 
 ## General Performance Boosting on Transformers
 
-By introducing the proposed framework, Transformer and its variants achieve **significant performance improvement**, demonstrating the generality of the iTransformer approach and the feasibility of **benefiting from efficient attention mechanisms**.
+By introducing the proposed framework, Transformer and its variants achieve **significant performance improvement**, demonstrating the **generality of the iTransformer approach** and **benefiting from efficient attention mechanisms**.
 
 <p align="center">
 <img src="./figures/boosting.png" alt="" align=center />
@@ -109,7 +113,7 @@ By introducing the proposed framework, Transformer and its variants achieve **si
 
 ## Generalization on Unseen Variates
 
-**Technically, iTransformer can forecast with arbitrary number of variables** during inference. We also dive into the capability, which further exhibit that iTransformer **achieves smaller generalization errors** compared with [Channel-independence](https://arxiv.org/pdf/2211.14730.pdf) when only partial variates are used for training.
+**Technically, iTransformer can forecast with arbitrary number of variables** during inference. We also dive into the capability, which further exhibit that iTransformer **achieves smaller generalization errors** compared with [Channel Independence](https://arxiv.org/pdf/2211.14730.pdf) when only partial variates are used for training.
 
 <p align="center">
 <img src="./figures/generability.png" alt="" align=center />
@@ -144,12 +148,11 @@ iTransformer that utilizes attention on variate dimensions and feed-forward on t
 
 ## Model Efficiency
 
-iTransformer achieves **efficiency improvement** over previous [Channel-independence](https://arxiv.org/pdf/2211.14730.pdf) mechanism. We further propose a training strategy for multivariate series by taking advantage of its variate generation ability. While the performance (Left) remains stable on partially trained variates of each batch with the sampled ratios, the memory footprint (Right) of the training process can be cut off significantly.
+iTransformer achieves **efficiency improvement** over previous [Channel Independence](https://arxiv.org/pdf/2211.14730.pdf) mechanism. We further propose a training strategy for multivariate series by taking advantage of its variate generation ability. While the performance (Left) remains stable on partially trained variates of each batch with the sampled ratios, the memory footprint (Right) of the training process can be cut off significantly.
 
 <p align="center">
 <img src="./figures/efficient.png" alt="" align=center />
 </p>
-
 
 ## Citation
 

@@ -2,7 +2,15 @@
 
 This folder contains the implementation of the iTransformer to generalize on unseen variates. If you are new to this repo, we recommend you to read this [README](../multivariate_forecast/README.md) first.
 
+By inverting vanilla Transformers, it is notable that the models are empowered with the generalization capability on unseen variates. Firstly, benefiting from the flexibility of the number of input tokens, the amount of variate channels is no longer restricted and thus feasible to vary from training and inference. Second, feed-forward networks are identically applied on independent variate tokens to learn transferable representations of time series.
+
 ## Scripts
+
+```
+# Train models with only the first 20% of variates from Traffic and test the model on all variates without finetuning
+
+bash ./scripts/variate_generalization/Traffic/iTransformer.sh
+```
 
 > During Training
 <p align="center">
@@ -14,11 +22,11 @@ This folder contains the implementation of the iTransformer to generalize on uns
 <img src="../../figures/pi.png" alt="" align=center />
 </p>
 
-In each folder named after the dataset, we provide two strategies to enable Transformers to generalize on unseen variate during inference. We use partial variates of the dataset for training, and test the obtained model directly on all variates.
+In each folder named after the dataset, we provide two strategies to enable Transformers to generalize on unseen variate.
 
-* **Channel-Independence**: During training, the model regards each variate of multivariate time series as independent channels, and uses a shared backbone to forecast all channels. Therefore, the model can work for arbitrary variate channels one by one, but the training procedure can also be time-consuming.
+* **CI-Transformers**: Channel Independence regards each variate of time series as independent channels, and uses a shared backbone to forecast all variates. Therefore, the model can predict variates one by one, but the training and inference procedure can be time-consuming.
 
-* **Inverted Attention**: Benefiting from the flexibility of the attention mechanism that the number of input tokens can be dynamically changeable. In our Inverted Transformer the amount of **variates as tokens** is no longer restricted and thus feasible to vary from training and inference.
+* **iTransformers**: benefiting from the flexibility of attention that the number of input tokens can be dynamically changeable, the amount of variates as tokens is no longer restricted, and can even allows the model to be trained on arbitrary variables.
 
 ## Results
 
@@ -26,4 +34,4 @@ In each folder named after the dataset, we provide two strategies to enable Tran
 <img src="../../figures/generability.png" alt="" align=center />
 </p>
 
-Performance of generalization on unseen variates. iTransformers can be naturally trained with 20% variates and accomplish forecast on all variates with hardly increased error, while Transformers with Channel Independence bring about significantly increased error.
+iTransformers can be naturally trained with 20% variates and accomplish forecast on all variates with the ability to learn transferable representations, while CI-Transformers can bring about more obvious increased error and is time-consuming in practice.
