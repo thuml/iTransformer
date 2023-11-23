@@ -57,8 +57,10 @@ class Exp_Long_Term_Forecast_Partial(Exp_Basic):
                     batch_y_mark = batch_y_mark.float().to(self.device)
 
                 if partial_train:  # we train models with only partial variates from the dataset
-                    batch_x = batch_x[:, :, -self.args.enc_in:]
-                    batch_y = batch_y[:, :, -self.args.enc_in:]
+                    partial_start = self.args.partial_start_index
+                    partial_end = min(self.args.enc_in + partial_start, batch_x.shape[-1])
+                    batch_x = batch_x[:, :, partial_start:partial_end]
+                    batch_y = batch_y[:, :, partial_start:partial_end]
 
                 # decoder input
                 dec_inp = torch.zeros_like(batch_y[:, -self.args.pred_len:, :]).float()
@@ -144,8 +146,10 @@ class Exp_Long_Term_Forecast_Partial(Exp_Basic):
                 # Variate Generalization training: 
                 # We train with partial variates (args.enc_in < number of dataset variates)
                 # and test the obtained model directly on all variates.
-                batch_x = batch_x[:, :, -self.args.enc_in:]
-                batch_y = batch_y[:, :, -self.args.enc_in:]
+                partial_start = self.args.partial_start_index
+                partial_end = min(self.args.enc_in + partial_start, batch_x.shape[-1])
+                batch_x = batch_x[:, :, partial_start:partial_end]
+                batch_y = batch_y[:, :, partial_start:partial_end]
                 # Efficient training strategy: randomly choose part of the variates
                 # and only train the model with selected variates in each batch 
                 if self.args.efficient_training:
