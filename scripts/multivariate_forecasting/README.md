@@ -1,6 +1,6 @@
 # iTransformer for Multivariate Time Series Forecasting
 
-This folder contains the implementation of the iTransformer for Multivariate Time Series Forecasting (MTSF).
+This folder contains the reproductions of the iTransformers for Multivariate Time Series Forecasting (MTSF).
 
 ## Dataset
 
@@ -17,13 +17,13 @@ In each folder named after the dataset, we provide the iTransformer experiments 
 ```
 # iTransformer on the Traffic Dataset
 
-bash ./scripts/multivariate_forecast/Traffic/iTransformer.sh
+bash ./scripts/multivariate_forecasting/Traffic/iTransformer.sh
 ```
 
-To evaluate the model under other input/prediction length, feel free to change the ```seq_len``` and ```pred_len``` arguments:
+To evaluate the model under other input/prediction lengths, feel free to change the ```seq_len``` and ```pred_len``` arguments:
 
 ```
-# iTransformer on the Electricity Dataset, where 180 time steps are inputed as the observations and the task is to predict the future 60 steps
+# iTransformer on the Electricity Dataset, where 180 time steps are inputted as the observations, and the task is to predict the future 60 steps
 
 python -u run.py \
   --is_training 1 \
@@ -53,5 +53,5 @@ python -u run.py \
 To train with your own time series dataset, you can try out the following steps:
 
 1. Read through the ```Dataset_Custom``` class under the ```data_provider/data_loader``` folder, which provides the functionality to load and process time series files.
-2. The file should be ```csv``` format with the first column contains the timestamp and the following columns contain the variates of time series.
-3. Set ```data=custom``` and modifiy the ```enc_in```, ```dec_in```, ```c_out``` arguments acoording to your number of variates in the training script.
+2. The file should be ```csv``` format with the first column containing the timestamp and the following columns containing the variates of time series.
+3. Set ```data=custom``` and modify the ```enc_in```, ```dec_in```, ```c_out``` arguments according to your number of variates in the training script.

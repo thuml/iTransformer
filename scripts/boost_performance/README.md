@@ -1,6 +1,6 @@
 # Inverted Transformers Work Better for Time Series Forecasting
 
-This folder contains the comparison of the vanilla Transformer-based forecasters and the inverted versions. If you are new to this repo, we recommend you to have a look at this [README](../multivariate_forecast/README.md) first.
+This folder contains the comparison of the vanilla Transformer-based forecasters and the inverted versions. If you are new to this repo, we recommend you to have a look at this [README](../multivariate_forecasting/README.md) first.
 
 ## Scripts
 

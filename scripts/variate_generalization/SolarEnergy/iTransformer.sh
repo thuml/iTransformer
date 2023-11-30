@@ -23,6 +23,7 @@ model_name=Transformer
 #  --learning_rate 0.0005 \
 #  --itr 1
 
+# 20% partial variates: 27 = 137 // 5
 python -u run.py \
   --is_training 1 \
   --root_path ./dataset/Solar/ \
@@ -37,7 +38,7 @@ python -u run.py \
   --e_layers 2 \
   --d_layers 1 \
   --factor 3 \
-  --enc_in 27 \
+  --enc_in 27 \     
   --dec_in 27 \
   --c_out 27 \
   --des 'Exp' \

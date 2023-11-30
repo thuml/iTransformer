@@ -22,6 +22,7 @@ model_name=Transformer
 #  --des 'Exp' \
 #  --itr 1
 
+# 20% partial variates, enc_in: 172 = 862 // 5
 python -u run.py \
   --is_training 1 \
   --root_path ./dataset/traffic/ \

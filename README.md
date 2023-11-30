@@ -2,34 +2,34 @@
 
 The repo is the official implementation for the paper: [iTransformer: Inverted Transformers Are Effective for Time Series Forecasting](https://arxiv.org/abs/2310.06625). It currently includes code implementations for the following tasks:
 
-> **Multivariate Forecasting**: We provide all scripts as well as datasets for the reproduction of forecasting results in this repo.
+> **[Multivariate Forecasting](./scripts/multivariate_forecasting/README.md)**: We provide all scripts as well as datasets for the reproduction of forecasting results in this repo.
 
-> **Boosting Forecasting of Transformers**: We are continuously incorporating Transformer variants. If you are interested in how well other Transformer variants work for forecasting tasks, feel free to contact us.
+> **[Boosting Forecasting of Transformers](./scripts/boost_performance/README.md)**:  iTransformer framework can consistently promote Transformer variants, and take advantage of the booming efficient attention mechanisms.
 
-> **Generalization on Unseen Variates**: iTransformer is demonstrated to generalize well on unseen time series, making it a nice alternative as the fundamental backbone of the large time series model.
+> **[Generalization on Unseen Variates](scripts/variate_generalization/README.md)**: iTransformer is demonstrated to generalize well on unseen time series, making it a nice alternative as the fundamental backbone of the large time series model.
 
-> **Better Utilization of Lookback Windows**: While Transformer does not necessarily benefit from the larger lookback window, iTransformer exhibits better utilization of the enlarged lookback window.
+> **[Better Utilization of Lookback Windows](scripts/increasing_lookback/README.md)**: While Transformer does not necessarily benefit from the larger lookback window, inverted Transformers exhibit better utilization of the enlarged lookback window.
 
-> **Adopt Efficient Attention and Training Strategy**: Efficient attentions and the feasibility of training on arbitrary number of variates can be leveraged to reduce the complexity when the number of variates is tremendous.
+> **[Adopt Efficient Attention and Training Strategy](scripts/model_efficiency/README.md)**: iTransformer can be feasibly trained on arbitrary numbers of variates, making it possible to train partially and inference on all. Also, efficient attentions can be leveraged to reduce the complexity on high-dimensional time series.
  
 # Updates
 
-:triangular_flag_on_post: **News** (2023.11) We receive lots of valuable suggestions during rebuttal. A [revised version](https://arxiv.org/pdf/2310.06625.pdf) is available, which contains more solid experiments and intuitive cases to support the peculiarities of our work.
-
-:triangular_flag_on_post: **News** (2023.10) All the scripts for the above tasks in our [paper](https://arxiv.org/pdf/2310.06625.pdf) are available in this repo.
+:triangular_flag_on_post: **News** (2023.11) We received lots of valuable suggestions during rebuttal. A [revised version](https://arxiv.org/pdf/2310.06625.pdf) (24 Pages) is now available, which contains more solid experiments and intuitive cases to support the peculiarities of our work.
 
 :triangular_flag_on_post: **News** (2023.10) iTransformer has been included in [[Time-Series-Library]](https://github.com/thuml/Time-Series-Library) and achieve the consistent state-of-the-art in long-term time series forecasting.
+
+:triangular_flag_on_post: **News** (2023.10) All the scripts for the above tasks in our [paper](https://arxiv.org/pdf/2310.06625.pdf) are available in this repo.
 
 
 ## Introduction
 
-🌟 Considering the characteristics of time series, iTransformer breaks the conventional model structure without the burden of modifying any Transformer modules. **Inverting Transformer is all you need in MTSF**.
+🌟 Considering the characteristics of multivariate time series, iTransformer breaks the conventional model structure without the burden of modifying any Transformer modules. **Inverted Transformer is all you need in MTSF**.
 
 <p align="center">
 <img src="./figures/motivation.png"  alt="" align=center />
 </p>
 
-🏆 iTransformer takes an **overall lead** in complex time series forecasting tasks and solves several pain points of Transformer modeling extensive time series data.
+🏆 iTransformer takes an **overall lead** in complex long-term time series forecasting tasks and solves several pain points of Transformer modeling extensive time series data.
 
 <p align="center">
 <img src="./figures/radar.png" height = "360" alt="" align=center />
@@ -67,7 +67,7 @@ pip install -r requirements.txt
 
 ```
 # Multivariate forecasting with iTransformer
-bash ./scripts/multivariate_forecast/Traffic/iTransformer.sh
+bash ./scripts/multivariate_forecasting/Traffic/iTransformer.sh
 
 # Compare the performance of Transformer and iTransformer
 bash ./scripts/boost_performance/Weather/iTransformer.sh
@@ -83,7 +83,7 @@ bash ./scripts/efficient_attentions/iFlashTransformer.sh
 ```
 
 ## Main Result of Multivariate Forecasting
-We evaluate the iTransformer on extensive challenging multivariate forecasting benchmarks as well as the server load prediction of Alipay online transactions (**generally hundreds of variates**, denoted as *Dim*). **Comprehensive good performance** (MSE/MAE) are achieved by iTransformer. Especially, iTransformer is particularly good at forecasting high-dimensional time series.
+We evaluate the iTransformer on extensive challenging multivariate forecasting benchmarks as well as the server load prediction of Alipay online transactions (**generally hundreds of variates**, denoted as *Dim*). **Comprehensive good performance** (MSE/MAE) is achieved by iTransformer. iTransformer is particularly good at forecasting high-dimensional time series.
 
 <p align="center">
 <img src="./figures/datasets.png" alt="" align=center />
@@ -113,7 +113,7 @@ By introducing the proposed framework, Transformer and its variants achieve **si
 
 ## Generalization on Unseen Variates
 
-**Technically, iTransformer can forecast with arbitrary number of variables** during inference. We also dive into the capability, which further exhibit that iTransformer **achieves smaller generalization errors** compared with [Channel Independence](https://arxiv.org/pdf/2211.14730.pdf) when only partial variates are used for training.
+**Technically, iTransformer can forecast with arbitrary numbers of variables** during inference. We also dive into the capability, which further exhibits that iTransformer **achieves smaller generalization errors** compared with [Channel Independence](https://arxiv.org/pdf/2211.14730.pdf) when only partial variates are used for training.
 
 <p align="center">
 <img src="./figures/generability.png" alt="" align=center />
@@ -136,6 +136,12 @@ Benefiting from inverted Transformer modules:
 
 <p align="center">
 <img src="./figures/analysis.png" alt="" align=center />
+</p>
+
+- Visualization of the variates from Market and the learned multivariate correlations. Each variate represents the monitored interface values of an application, and the applications can be further grouped into refined categories.
+
+<p align="center">
+<img src="./figures/groups.png" alt="" align=center />
 </p>
 
 ## Model Abalations
@@ -170,7 +176,7 @@ If you find this repo helpful, please cite our paper.
 ## Future Work
 
 - [ ] iTransformer for other time series tasks.
-- [ ] Integrating more Transformer variants.
+- [ ] Integrating Transformer variants.
 - [ ] iTransformer Scalability.
 
 ## Acknowledgement
