@@ -34,4 +34,4 @@ In each folder named after the dataset, we provide two strategies to enable Tran
 <img src="../../figures/generability.png" alt="" align=center />
 </p>
 
-iTransformers can be naturally trained with 20% variates and accomplish forecasts on all variates with the ability to learn transferable representations, while CI-Transformers can bring about more obvious increased error and is time-consuming in practice.
+ iTransformers can be naturally trained with 20% variates and accomplish forecast on all variates with the ability to learn transferable representations.

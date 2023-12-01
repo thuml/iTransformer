@@ -14,7 +14,7 @@ The repo is the official implementation for the paper: [iTransformer: Inverted T
  
 # Updates
 
-:triangular_flag_on_post: **News** (2023.11) We received lots of valuable suggestions during rebuttal. A [revised version](https://arxiv.org/pdf/2310.06625.pdf) (24 Pages) is now available, which contains more solid experiments and intuitive cases to support the peculiarities of our work.
+:triangular_flag_on_post: **News** (2023.12) We received lots of valuable suggestions. A [revised version](https://arxiv.org/pdf/2310.06625.pdf) (24 Pages) is now available, which includes more experiments, intuitive cases, in-depth analysis and potential enhancement of our work.
 
 :triangular_flag_on_post: **News** (2023.10) iTransformer has been included in [[Time-Series-Library]](https://github.com/thuml/Time-Series-Library) and achieve the consistent state-of-the-art in long-term time series forecasting.
 
@@ -29,7 +29,7 @@ The repo is the official implementation for the paper: [iTransformer: Inverted T
 <img src="./figures/motivation.png"  alt="" align=center />
 </p>
 
-🏆 iTransformer takes an **overall lead** in complex long-term time series forecasting tasks and solves several pain points of Transformer modeling extensive time series data.
+🏆 iTransformer takes an **overall lead** in challenging long-term time series forecasting tasks and solves several pain points of Transformer modeling extensive time series data.
 
 <p align="center">
 <img src="./figures/radar.png" height = "360" alt="" align=center />
@@ -113,7 +113,7 @@ By introducing the proposed framework, Transformer and its variants achieve **si
 
 ## Generalization on Unseen Variates
 
-**Technically, iTransformer can forecast with arbitrary numbers of variables** during inference. We also dive into the capability, which further exhibits that iTransformer **achieves smaller generalization errors** compared with [Channel Independence](https://arxiv.org/pdf/2211.14730.pdf) when only partial variates are used for training.
+**Technically, iTransformer can forecast with arbitrary numbers of variables** during inference. We partition the variates of each dataset into five folders, train models with 20% variates, and use the partially trained model to forecast all varieties. iTransformers can be trained efficiently and forecast unseen variates with good generalizability.
 
 <p align="center">
 <img src="./figures/generability.png" alt="" align=center />
