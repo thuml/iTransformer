@@ -1,6 +1,6 @@
 # Efficiency Improvement of iTransformer
 
-The attention module has a complexity of $\mathcal{O}(L^2)$, where $L$ is the number of tokens. 
+Supposing the input multivariate time series has a shape of $T \times N$. The vanilla attention module has a complexity of $\mathcal{O}(L^2)$, where $L$ is the number of tokens. 
 
 * In Transformer, we have $L=T$ because of the manner of time points as tokens. 
 * In iTransformer, we have $L=N$ because of the manner of variates as tokens. 
