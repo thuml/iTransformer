@@ -14,7 +14,7 @@ The repo is the official implementation for the paper: [iTransformer: Inverted T
  
 # Updates
 
-:triangular_flag_on_post: **News** (2023.12) We received lots of valuable suggestions. A **[revised version](https://arxiv.org/pdf/2310.06625v2.pdf) (24 Pages)** is now available, which includes extensive experiments, intuitive cases, in-depth analysis and further improvement of our work.
+:triangular_flag_on_post: **News** (2023.12) We received lots of valuable suggestions. A [revised version](https://arxiv.org/pdf/2310.06625v2.pdf) (**24 Pages**) is now available, which includes extensive experiments, intuitive cases, in-depth analysis and further improvement of our work.
 
 :triangular_flag_on_post: **News** (2023.10) iTransformer has been included in [[Time-Series-Library]](https://github.com/thuml/Time-Series-Library) and achieve the consistent state-of-the-art in long-term time series forecasting.
 
