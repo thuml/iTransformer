@@ -316,8 +316,7 @@ class Exp_Long_Term_Forecast(Exp_Basic):
                 if pred_data.scale and self.args.inverse:
                     shape = outputs.shape
                     outputs = pred_data.inverse_transform(outputs.squeeze(0)).reshape(shape)
-                pred = outputs  # .detach().cpu().numpy()  # .squeeze()
-                preds.append(pred)
+                preds.append(outputs)
 
         preds = np.array(preds)
         preds = preds.reshape(-1, preds.shape[-2], preds.shape[-1])
