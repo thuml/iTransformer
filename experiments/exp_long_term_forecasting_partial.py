@@ -23,6 +23,7 @@ class Exp_Long_Term_Forecast_Partial(Exp_Basic):
         super(Exp_Long_Term_Forecast_Partial, self).__init__(args)
 
     def _build_model(self):
+        # 根据cmd指令构造相应模型，模型参数基于args
         model = self.model_dict[self.args.model].Model(self.args).float()
 
         if self.args.use_multi_gpu and self.args.use_gpu:
@@ -34,6 +35,9 @@ class Exp_Long_Term_Forecast_Partial(Exp_Basic):
         return data_set, data_loader
 
     def _select_optimizer(self):
+        # 选择求解器 默认Adam，param_groups为模型所有参数，学习率默认为0.001（args.learning_rate）
+        # model.parameters()返回模型的全部参数，并将它们传入Adam函数构造出一个Adam优化器，并设置 learning rate=0.001。
+        # 因此该 Adam 优化器的 param_groups 维护的就是模型 model 的全部参数，并且学习率为0.001，这样在调用optimizer_Adam.step()时，就会对model的全部参数进行更新。
         model_optim = optim.Adam(self.model.parameters(), lr=self.args.learning_rate)
         return model_optim
 

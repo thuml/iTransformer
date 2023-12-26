@@ -8,7 +8,7 @@ from utils.timefeatures import time_features
 import warnings
 
 warnings.filterwarnings('ignore')
-
+#ETT_hour,minute均由OT作为目标列，custom结合实际数据可以自己看看，PEMS，Solar无OT列，target属性基本没用
 
 class Dataset_ETT_hour(Dataset):
     def __init__(self, root_path, flag='train', size=None,
@@ -533,3 +533,28 @@ class Dataset_Pred(Dataset):
 
     def inverse_transform(self, data):
         return self.scaler.inverse_transform(data)
+
+
+class Dataset_HighD(Dataset):
+    # Dataset是用来解决数据从哪里读取以及如何读取的问题。
+    # pytorch给定的Dataset是一个抽象类，所有自定义的Dataset都要继承它，并且复写__getitem__()和__len__()类方法
+    # __getitem__()的作用是接受一个索引，返回一个样本或者标签。
+    def __init__(self,root_path,flag,size,targe):
+        pass
+    def __len__(self):
+        pass
+    def __getitem__(self, item):
+        pass
+
+
+class Dataset_Interaction(Dataset):
+    # Dataset是用来解决数据从哪里读取以及如何读取的问题。
+    # pytorch给定的Dataset是一个抽象类，所有自定义的Dataset都要继承它，并且复写__getitem__()和__len__()类方法
+    # __getitem__()的作用是接受一个索引，返回一个样本或者标签。
+    def __init__(self,):
+        pass
+    def __getitem__(self, item):
+        pass
+    def __len__(self):
+        pass
+

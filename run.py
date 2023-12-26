@@ -14,15 +14,20 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='iTransformer')
 
     # basic config
+    # 参数--is_training被设置为required=True，那么实际上默认值default=1将不会生效。因为用户必须显式地提供该参数，所以默认值实际上不会起作用。
+    # 在这种情况下，要么将required设置为False，允许使用默认值，要么将默认值移除并确保用户提供值。混合使用required=True和default有些多余
     parser.add_argument('--is_training', type=int, required=True, default=1, help='status')
     parser.add_argument('--model_id', type=str, required=True, default='test', help='model id')
     parser.add_argument('--model', type=str, required=True, default='iTransformer',
                         help='model name, options: [iTransformer, iInformer, iReformer, iFlowformer, iFlashformer]')
 
     # data loader
+    # 关键参数：决定data_provider要读取什么数据Data = data_dict[args.data]
     parser.add_argument('--data', type=str, required=True, default='custom', help='dataset type')
-    parser.add_argument('--root_path', type=str, default='./data/electricity/', help='root path of the data file')
-    parser.add_argument('--data_path', type=str, default='electricity.csv', help='data csv file')
+    # parser.add_argument('--root_path', type=str, default='./data/electricity/', help='root path of the data file')
+    # parser.add_argument('--data_path', type=str, default='electricity.csv', help='data csv file')
+    parser.add_argument('--root_path', type=str, default='./data/PEMS/', help='root path of the data file')
+    parser.add_argument('--data_path', type=str, default='PEMS03.npz', help='data csv file')
     parser.add_argument('--features', type=str, default='M',
                         help='forecasting task, options:[M, S, MS]; M:multivariate predict multivariate, S:univariate predict univariate, MS:multivariate predict univariate')
     parser.add_argument('--target', type=str, default='OT', help='target feature in S or MS task')
@@ -60,7 +65,8 @@ if __name__ == '__main__':
     parser.add_argument('--num_workers', type=int, default=10, help='data loader num workers')
     parser.add_argument('--itr', type=int, default=1, help='experiments times')
     parser.add_argument('--train_epochs', type=int, default=10, help='train epochs')
-    parser.add_argument('--batch_size', type=int, default=32, help='batch size of train input data')
+    # parser.add_argument('--batch_size', type=int, default=32, help='batch size of train input data')
+    parser.add_argument('--batch_size', type=int, default=8, help='batch size of train input data')
     parser.add_argument('--patience', type=int, default=3, help='early stopping patience')
     parser.add_argument('--learning_rate', type=float, default=0.0001, help='optimizer learning rate')
     parser.add_argument('--des', type=str, default='test', help='exp description')

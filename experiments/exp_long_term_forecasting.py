@@ -15,8 +15,8 @@ warnings.filterwarnings('ignore')
 
 class Exp_Long_Term_Forecast(Exp_Basic):
     def __init__(self, args):
-        super(Exp_Long_Term_Forecast, self).__init__(args)
-
+        super(Exp_Long_Term_Forecast, self).__init__(args)#可以将传入Exp_Long_Term_Forecast类的参数args传递给父类Exp_Basic的初始化方法，以便进行合适的初始化操作
+        # super()函数，它的作用是调用父类（即Exp_Basic类）的方法。
     def _build_model(self):
         model = self.model_dict[self.args.model].Model(self.args).float()
 
@@ -81,6 +81,10 @@ class Exp_Long_Term_Forecast(Exp_Basic):
         return total_loss
 
     def train(self, setting):
+        '''
+        通过exp的args设定实验情景，进行模型训练
+        '''
+        # 生成满足要求的Dataset以及相应的Dataloader
         train_data, train_loader = self._get_data(flag='train')
         vali_data, vali_loader = self._get_data(flag='val')
         test_data, test_loader = self._get_data(flag='test')
@@ -97,10 +101,11 @@ class Exp_Long_Term_Forecast(Exp_Basic):
         model_optim = self._select_optimizer()
         criterion = self._select_criterion()
 
-        if self.args.use_amp:
+        if self.args.use_amp:# 是否开启自动混合精度训练：默认不开启
             scaler = torch.cuda.amp.GradScaler()
 
         for epoch in range(self.args.train_epochs):
+            # 通过args就已经设计好了模型的训练轮数？？
             iter_count = 0
             train_loss = []
 
@@ -124,7 +129,7 @@ class Exp_Long_Term_Forecast(Exp_Basic):
                 dec_inp = torch.cat([batch_y[:, :self.args.label_len, :], dec_inp], dim=1).float().to(self.device)
 
                 # encoder - decoder
-                if self.args.use_amp:
+                if self.args.use_amp:# 是否开启自动混合精度训练：默认不开启
                     with torch.cuda.amp.autocast():
                         if self.args.output_attention:
                             outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)[0]
@@ -226,7 +231,18 @@ class Exp_Long_Term_Forecast(Exp_Basic):
 
                     else:
                         outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
-
+                # https://github.com/thuml/Time-Series-Library/issues/254
+                # f_dim = -1 if self.args.features == 'MS' else 0
+                # outputs = outputs[:, -self.args.pred_len:, f_dim:]
+                # batch_y = batch_y[:, -self.args.pred_len:, f_dim:].to(self.device)
+                # outputs = outputs.detach().cpu().numpy()
+                # batch_y = batch_y.detach().cpu().numpy()
+                # if test_data.scale and self.args.inverse:
+                #     outputs = test_data.inverse_transform(outputs)
+                #     batch_y = test_data.inverse_transform(batch_y)
+                # 保留了除了最后一个维度中 f_dim 索引之后的所有数据。这可能是为了去除一些不需要的特征维度或者进行其他相关的处理。
+                # 生成两个相同的数据outputs和batch_y
+                # 可能是因为它们在后续的操作中需要进行不同的处理，并且需要保留原始的数据用于比较或其他用途。
                 f_dim = -1 if self.args.features == 'MS' else 0
                 outputs = outputs[:, -self.args.pred_len:, f_dim:]
                 batch_y = batch_y[:, -self.args.pred_len:, f_dim:].to(self.device)

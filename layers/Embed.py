@@ -23,7 +23,6 @@ class PositionalEmbedding(nn.Module):
     def forward(self, x):
         return self.pe[:, :x.size(1)]
 
-
 class TokenEmbedding(nn.Module):
     def __init__(self, c_in, d_model):
         super(TokenEmbedding, self).__init__()
@@ -38,7 +37,6 @@ class TokenEmbedding(nn.Module):
     def forward(self, x):
         x = self.tokenConv(x.permute(0, 2, 1)).transpose(1, 2)
         return x
-
 
 class FixedEmbedding(nn.Module):
     def __init__(self, c_in, d_model):
@@ -59,7 +57,6 @@ class FixedEmbedding(nn.Module):
 
     def forward(self, x):
         return self.emb(x).detach()
-
 
 class TemporalEmbedding(nn.Module):
     def __init__(self, d_model, embed_type='fixed', freq='h'):
@@ -89,7 +86,6 @@ class TemporalEmbedding(nn.Module):
         month_x = self.month_embed(x[:, :, 0])
 
         return hour_x + weekday_x + day_x + month_x + minute_x
-
 
 class TimeFeatureEmbedding(nn.Module):
     def __init__(self, d_model, embed_type='timeF', freq='h'):
