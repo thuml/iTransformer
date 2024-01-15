@@ -39,7 +39,7 @@ class Model(nn.Module):
         )
         self.projector = nn.Linear(configs.d_model, configs.pred_len, bias=True)
 
-    def forecast(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
+    def forecast(self, x_enc, x_mark_enc):
         if self.use_norm:
             # Normalization from Non-stationary Transformer
             means = x_enc.mean(1, keepdim=True).detach()
@@ -71,6 +71,6 @@ class Model(nn.Module):
         return dec_out
 
 
-    def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec, mask=None):
-        dec_out = self.forecast(x_enc, x_mark_enc, x_dec, x_mark_dec)
+    def forward(self, x_enc, x_mark_enc, x_dec=None, x_mark_dec=None, mask=None):
+        dec_out = self.forecast(x_enc, x_mark_enc)
         return dec_out[:, -self.pred_len:, :]  # [B, L, D]
