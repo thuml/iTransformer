@@ -175,12 +175,6 @@ If you find this repo helpful, please cite our paper.
 }
 ```
 
-## Future Work
-
-- [ ] iTransformer for other time series tasks.
-- [ ] Integrating Transformer variants.
-- [ ] iTransformer Scalability.
-
 ## Acknowledgement
 
 We appreciate the following GitHub repos a lot for their valuable code and efforts.
