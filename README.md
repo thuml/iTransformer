@@ -77,7 +77,7 @@ bash ./scripts/multivariate_forecasting/Traffic/iTransformer.sh
 bash ./scripts/boost_performance/Weather/iTransformer.sh
 
 # Train the model with partial variates, and generalize on the unseen variates
-bash ./scripts/variate_generalization/Electricity/iTransformer.sh
+bash ./scripts/variate_generalization/ECL/iTransformer.sh
 
 # Test the performance on the enlarged lookback window
 bash ./scripts/increasing_lookback/Traffic/iTransformer.sh
