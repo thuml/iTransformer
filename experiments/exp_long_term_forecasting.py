@@ -16,6 +16,8 @@ warnings.filterwarnings('ignore')
 class Exp_Long_Term_Forecast(Exp_Basic):
     def __init__(self, args):
         super(Exp_Long_Term_Forecast, self).__init__(args)
+        self.train_losses = []
+        self.test_losses = []
 
     def _build_model(self):
         model = self.model_dict[self.args.model].Model(self.args).float()
@@ -29,11 +31,51 @@ class Exp_Long_Term_Forecast(Exp_Basic):
         return data_set, data_loader
 
     def _select_optimizer(self):
-        model_optim = optim.Adam(self.model.parameters(), lr=self.args.learning_rate)
+        if self.args.kind_of_optim == 'AdamW':
+            model_optim = optim.AdamW(self.model.parameters(), lr=self.args.learning_rate)
+        elif self.args.kind_of_optim == 'SparseAdam':
+            model_optim = optim.SparseAdam(self.model.parameters(), lr=self.args.learning_rate)
+        elif self.args.kind_of_optim == 'SGD':
+            model_optim = optim.SGD(self.model.parameters(), lr=self.args.learning_rate)
+        elif self.args.kind_of_optim == 'RMSprop':
+            model_optim = optim.RMSprop(self.model.parameters(), lr=self.args.learning_rate)
+        elif self.args.kind_of_optim == 'RAdam':
+            model_optim = optim.RAdam(self.model.parameters(), lr=self.args.learning_rate)
+        elif self.args.kind_of_optim == 'NAdam':
+            model_optim = optim.NAdam(self.model.parameters(), lr=self.args.learning_rate)
+        elif self.args.kind_of_optim == 'LBFGS':
+            model_optim = optim.LBFGS(self.model.parameters(), lr=self.args.learning_rate)
+        elif self.args.kind_of_optim == 'Adamax':
+            model_optim = optim.Adamax(self.model.parameters(), lr=self.args.learning_rate)
+        elif self.args.kind_of_optim == 'ASGD':
+            model_optim = optim.ASGD(self.model.parameters(), lr=self.args.learning_rate)
+        elif self.args.kind_of_optim == 'Adadelta':
+            model_optim = optim.Adadelta(self.model.parameters(), lr=self.args.learning_rate)
+        elif self.args.kind_of_optim == 'Adagrad':
+            model_optim = optim.Adagrad(self.model.parameters(), lr=self.args.learning_rate)
+        else:
+            model_optim = optim.Adam(self.model.parameters(), lr=self.args.learning_rate)
+        
         return model_optim
 
     def _select_criterion(self):
-        criterion = nn.MSELoss()
+        if self.args.criter.lower() == 'wmape':
+            criterion = WeightedMeanAbsolutePercentageError()
+        elif self.args.criter.lower() == 'smape':
+            criterion = SymmetricMeanAbsolutePercentageError()
+        elif self.args.criter.lower() == 'mae':
+            criterion = nn.L1Loss()
+        elif self.args.criter.lower() == 'rmse':
+            criterion = RMSELoss()
+        elif self.args.criter.lower() == 'quantileloss':
+            criterion = QuantileLoss()
+        elif self.args.criter.lower() == 'huberloss':
+            criterion = HuberLoss()
+        elif self.args.criter.lower() == 'pinballloss':
+            criterion = PinballLoss()
+        else:
+            criterion = nn.MSELoss()  # Default to Mean Squared Error
+        
         return criterion
 
     def vali(self, vali_data, vali_loader, criterion):
@@ -168,7 +210,8 @@ class Exp_Long_Term_Forecast(Exp_Basic):
             train_loss = np.average(train_loss)
             vali_loss = self.vali(vali_data, vali_loader, criterion)
             test_loss = self.vali(test_data, test_loader, criterion)
-
+            self.train_losses.append(train_loss)
+            self.test_losses.append(test_loss)
             print("Epoch: {0}, Steps: {1} | Train Loss: {2:.7f} Vali Loss: {3:.7f} Test Loss: {4:.7f}".format(
                 epoch + 1, train_steps, train_loss, vali_loss, test_loss))
             early_stopping(vali_loss, self.model, path)
