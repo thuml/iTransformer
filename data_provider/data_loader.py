@@ -194,7 +194,7 @@ class Dataset_Custom(Dataset):
                  root_path, flag='train', size=None,
                  features='S', data_path='data.csv',
                  target='Close', scale=True, timeenc=0, freq='b',
-                 test_size = 0.2, kind_of_scaler = 'Standard', name_of_col_with_date = 'date'):
+                 test_size = 0.2, kind_of_scaler = None, name_of_col_with_date = None):
         # size [seq_len, label_len, pred_len]
         # info
         if size == None:
@@ -217,8 +217,8 @@ class Dataset_Custom(Dataset):
         self.freq = freq
         self.test_size = test_size
         self.train_size = 0.90 - test_size
-        self.kind_of_scaler = kind_of_scaler
-        self.name_of_col_with_date = name_of_col_with_date
+        self.kind_of_scaler = kind_of_scaler if kind_of_scaler is not None else 'Standard'
+        self.name_of_col_with_date = name_of_col_with_date if name_of_col_with_dateis is not None else 'date'
         self.root_path = root_path
         self.data_path = data_path
         self.__read_data__()
