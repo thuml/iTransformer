@@ -194,13 +194,13 @@ class Dataset_Custom(Dataset):
                  root_path, flag='train', size=None,
                  features='S', data_path='data.csv',
                  target='Close', scale=True, timeenc=0, freq='b',
-                 test_size = 0.2, direct_data = None, name_of_col_with_dates = 'date'):
+                 test_size = 0.2, direct_data = None, name_of_col_with_date = 'date'):
         # size [seq_len, label_len, pred_len]
         # info
         if size == None:
-            self.seq_len = 24 * 4 * 4
-            self.label_len = 24 * 4
-            self.pred_len = 24 * 4
+            self.seq_len = 1 * 5 * 3        # Three week - work week ! only 5 days are alive!
+            self.label_len = 1 * 1            # Predict one day ahead
+            self.pred_len = 1 * 1            # Just for one time!
         else:
             self.seq_len = size[0]
             self.label_len = size[1]
@@ -255,31 +255,40 @@ class Dataset_Custom(Dataset):
             df_data = df_raw[[self.target]]
         
         if self.scale:
-            col_scaled = []
-            for col in df_data.columns:
-                col_data = df_data[[col]].values
-                if self.kind_of_scaler == 'MinMax':
-                    if col == self.target:
-                        self.scaler = MinMaxScaler()
+            if self.features == 'S' or self.features == 'MS':
+                col_scaled = []
+                for col in df_data.columns:
+                    col_data = df_data[[col]].values
+                    if self.kind_of_scaler == 'MinMax':
+                        if col == self.target:
+                            self.scaler = MinMaxScaler()
+                        else:
+                            scaler = MinMaxScaler()
                     else:
-                        scaler = MinMaxScaler()
-                else:
+                        if col == self.target:
+                            self.scaler = StandardScaler()
+                        else:
+                            scaler = StandardScaler()
                     if col == self.target:
-                        self.scaler = StandardScaler()
+                        self.scaler.fit(col_data[border1s[0]:border2s[0]])
+                        joblib.dump(self.scaler, os.path.join(self.root_path, 'scaler.pkl'))
+                        col_temp = self.scaler.transform(col_data)
                     else:
-                        scaler = StandardScaler()
-                if col == self.target:
-                    self.scaler.fit(col_data[border1s[0]:border2s[0]])
-                    joblib.dump(self.scaler, os.path.join(self.root_path, 'scaler.pkl'))
-                    col_temp = self.scaler.transform(col_data)
+                        scaler.fit(col_data[border1s[0]:border2s[0]])
+                        col_temp = scaler.transform(col_data)
+                    col_scaled.append(col_temp)
+                if len(col_scaled) == 1:
+                    data = col_scaled[0]
                 else:
-                    scaler.fit(col_data[border1s[0]:border2s[0]])
-                    col_temp = scaler.transform(col_data)
-                col_scaled.append(col_temp)
-            if len(col_scaled) == 1:
-                data = col_scaled[0]
+                    data = np.concatenate(col_scaled, axis = 1)
             else:
-                data = np.concatenate(col_scaled, axis = 1)
+                if self.kind_of_scaler == 'MinMax':
+                    self.scaler = MinMaxScaler()
+                else:
+                    self.scaler = StandardScaler()
+                train_data = df_data[border1s[0]:border2s[0]]
+                self.scaler.fit(train_data.values)
+                data = self.scaler.transform(df_data.values)
         else:
             data = df_data.values
         
