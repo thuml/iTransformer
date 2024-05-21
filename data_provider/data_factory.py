@@ -43,6 +43,11 @@ def data_provider(args, flag):
         target=args.target,
         timeenc=timeenc,
         freq=freq,
+        test_size = args.test_size,
+        kind_of_scaler=args.kind_of_scaler,
+        name_of_col_with_date = args.name_of_col_with_date,
+        scale = args.scale,
+        
     )
     print(flag, len(data_set))
     data_loader = DataLoader(
