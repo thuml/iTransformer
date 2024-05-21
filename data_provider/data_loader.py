@@ -194,7 +194,7 @@ class Dataset_Custom(Dataset):
                  root_path, flag='train', size=None,
                  features='S', data_path='data.csv',
                  target='Close', scale=True, timeenc=0, freq='b',
-                 test_size = 0.2, direct_data = None, name_of_col_with_date = 'date'):
+                 test_size = 0.2, kind_of_scaler = 'Standard', name_of_col_with_date = 'date'):
         # size [seq_len, label_len, pred_len]
         # info
         if size == None:
@@ -218,7 +218,7 @@ class Dataset_Custom(Dataset):
         self.test_size = test_size
         self.train_size = 0.90 - test_size
         self.kind_of_scaler = kind_of_scaler
-        self.name_of_col_with_dates = name_of_col_with_dates
+        self.name_of_col_with_date = name_of_col_with_date
         self.root_path = root_path
         self.data_path = data_path
         self.__read_data__()
@@ -234,8 +234,8 @@ class Dataset_Custom(Dataset):
         
         cols = list(df_raw.columns)
         cols.remove(self.target)
-        cols.remove(self.name_of_col_with_dates)
-        df_raw = df_raw[[self.name_of_col_with_dates] + cols + [self.target]]
+        cols.remove(self.name_of_col_with_date)
+        df_raw = df_raw[[self.name_of_col_with_date] + cols + [self.target]]
         cols.insert(0, 'date')
         cols.append(self.target)
         df_raw = df_raw.set_axis(cols, axis=1)
