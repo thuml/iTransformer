@@ -473,21 +473,25 @@ class Dataset_Solar(Dataset):
 
 class Dataset_Pred(Dataset):
     def __init__(self, root_path, flag='pred', size=None,
-                 features='S', data_path='ETTh1.csv',
-                 target='OT', scale=True, inverse=False, timeenc=0, freq='15min', cols=None):
+                 features='S', data_path='data.csv',
+                 target='Close', scale=True, inverse=True, timeenc=0, freq='b', cols=None, 
+                 test_size = None, kind_of_scaler = None, name_of_col_with_date = None):
         # size [seq_len, label_len, pred_len]
         # info
         if size == None:
-            self.seq_len = 24 * 4 * 4
-            self.label_len = 24 * 4
-            self.pred_len = 24 * 4
+            self.seq_len = 1 * 5 * 6
+            self.label_len = 1 * 1
+            self.pred_len = 1 * 1
         else:
             self.seq_len = size[0]
             self.label_len = size[1]
             self.pred_len = size[2]
         # init
         assert flag in ['pred']
-
+        
+        self.test_size = None
+        self.kind_of_scaler = kind_of_scaler if kind_of_scaler is not None else 'Standard'
+        self.name_of_col_with_date = name_of_col_with_date if name_of_col_with_date is not None else 'date'
         self.features = features
         self.target = target
         self.scale = scale
@@ -512,8 +516,11 @@ class Dataset_Pred(Dataset):
         else:
             cols = list(df_raw.columns)
             cols.remove(self.target)
-            cols.remove('date')
-        df_raw = df_raw[['date'] + cols + [self.target]]
+            cols.remove(self.name_of_col_with_date)
+        df_raw = df_raw[[self.name_of_col_with_date] + cols + [self.target]]
+        cols.insert(0, 'date')
+        cols.append(self.target)
+        df_raw = df_raw.set_axis(cols, axis=1)
         border1 = len(df_raw) - self.seq_len
         border2 = len(df_raw)
 
@@ -524,8 +531,40 @@ class Dataset_Pred(Dataset):
             df_data = df_raw[[self.target]]
 
         if self.scale:
-            self.scaler.fit(df_data.values)
-            data = self.scaler.transform(df_data.values)
+            if self.features == 'S' or self.features == 'MS':
+                col_scaled = []
+                for col in df_data.columns:
+                    col_data = df_data[[col]].values
+                    if self.kind_of_scaler == 'MinMax':
+                        if col == self.target:
+                            self.scaler = MinMaxScaler()
+                        else:
+                            scaler = MinMaxScaler()
+                    else:
+                        if col == self.target:
+                            self.scaler = StandardScaler()
+                        else:
+                            scaler = StandardScaler()
+                    if col == self.target:
+                        self.scaler.fit(col_data)
+                        joblib.dump(self.scaler, os.path.join(self.root_path, 'scaler.pkl'))
+                        col_temp = self.scaler.transform(col_data)
+                    else:
+                        scaler.fit(col_data)
+                        col_temp = scaler.transform(col_data)
+                    col_scaled.append(col_temp)
+                if len(col_scaled) == 1:
+                    data = col_scaled[0]
+                else:
+                    data = np.concatenate(col_scaled, axis = 1)
+            else:
+                if self.kind_of_scaler == 'MinMax':
+                    self.scaler = MinMaxScaler()
+                else:
+                    self.scaler = StandardScaler()
+                
+                self.scaler.fit(df_data.values)
+                data = self.scaler.transform(df_data.values)
         else:
             data = df_data.values
 
@@ -542,7 +581,7 @@ class Dataset_Pred(Dataset):
             df_stamp['hour'] = df_stamp.date.apply(lambda row: row.hour, 1)
             df_stamp['minute'] = df_stamp.date.apply(lambda row: row.minute, 1)
             df_stamp['minute'] = df_stamp.minute.map(lambda x: x // 15)
-            data_stamp = df_stamp.drop(['date'], 1).values
+            data_stamp = df_stamp.drop(['date'], axis=1).values
         elif self.timeenc == 1:
             data_stamp = time_features(pd.to_datetime(df_stamp['date'].values), freq=self.freq)
             data_stamp = data_stamp.transpose(1, 0)
