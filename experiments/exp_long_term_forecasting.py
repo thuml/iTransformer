@@ -16,6 +16,8 @@ warnings.filterwarnings('ignore')
 class Exp_Long_Term_Forecast(Exp_Basic):
     def __init__(self, args):
         super(Exp_Long_Term_Forecast, self).__init__(args)
+        self.trues_during_training = []
+        self.preds_during_training = []
         self.train_losses = []
         self.test_losses = []
 
@@ -188,6 +190,8 @@ class Exp_Long_Term_Forecast(Exp_Basic):
                     outputs = outputs[:, -self.args.pred_len:, f_dim:]
                     batch_y = batch_y[:, -self.args.pred_len:, f_dim:].to(self.device)
                     loss = criterion(outputs, batch_y)
+                    self.preds_during_training.append(outputs)
+                    self.trues_during_training.append(batch_y)
                     train_loss.append(loss.item())
 
                 if (i + 1) % 100 == 0:
