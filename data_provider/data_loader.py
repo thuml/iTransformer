@@ -218,7 +218,7 @@ class Dataset_Custom(Dataset):
         self.test_size = test_size
         self.train_size = 0.90 - test_size
         self.kind_of_scaler = kind_of_scaler if kind_of_scaler is not None else 'Standard'
-        self.name_of_col_with_date = name_of_col_with_date if name_of_col_with_dateis is not None else 'date'
+        self.name_of_col_with_date = name_of_col_with_date if name_of_col_with_date is not None else 'date'
         self.root_path = root_path
         self.data_path = data_path
         self.__read_data__()
