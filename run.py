@@ -15,6 +15,27 @@ np.random.seed(fix_seed)
 
 arg = dotdict()
 
+# NEW OPTIONS : #
+
+arg.test_size = None                 # default is 0.2 which makes the training 0.7 ! #
+arg.kind_of_scaler = None            # default is 'Standard'. Another Option is 'MinMax' (recommended) #
+arg.name_of_col_with_date = None     # default is 'date'. Name of your date column in your dataset #
+
+arg.kind_of_optim = 'default'        # default is 'Adam'.
+                                     # other options : 'AdamW', 'SparseAdam', 'SGD', 'RMSprop', 'RAdam', 'NAdam' ,'LBFGS',
+                                     #                     'Adamax' 'ASGD' 'Adadelta' 'Adagrad'
+
+arg.criter = 'default'               # default is nn.MSELoss ( Mean Squared Error )
+                                     # other options : 'wmape', 'smape', 'mae', 'rmse', 'quantileloss', 'huberloss', 'pinballloss'
+
+# NEW Accessories : #
+
+exp.trues_during_training
+exp.preds_during_training
+exp.train_losses
+exp.test_losses
+
+#####################
 
 arg.is_training = 1                         # help: status
 arg.model_id = 'test'
