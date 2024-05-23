@@ -335,7 +335,8 @@ class Exp_Long_Term_Forecast(Exp_Basic):
             self.model.load_state_dict(torch.load(best_model_path))
 
         preds = []
-
+        true_values = []
+        
         self.model.eval()
         with torch.no_grad():
             for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(pred_loader):
@@ -344,6 +345,7 @@ class Exp_Long_Term_Forecast(Exp_Basic):
                 batch_x_mark = batch_x_mark.float().to(self.device)
                 batch_y_mark = batch_y_mark.float().to(self.device)
 
+                true_values.append(batch_y.cpu().numpy())
                 # decoder input
                 dec_inp = torch.zeros_like(batch_y[:, -self.args.pred_len:, :]).float()
                 dec_inp = torch.cat([batch_y[:, :self.args.label_len, :], dec_inp], dim=1).float().to(self.device)
@@ -368,11 +370,18 @@ class Exp_Long_Term_Forecast(Exp_Basic):
         preds = np.array(preds)
         preds = preds.reshape(-1, preds.shape[-2], preds.shape[-1])
 
+        true_values = np.concatenate(true_values, axis=0)
         # result save
         folder_path = './results/' + setting + '/'
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
 
-        np.save(folder_path + 'real_prediction.npy', preds)
+        pred_save_path = folder_path + 'Preds real_prediction.npy'
+        true_save_path = folder_path + 'true_values.npy'
+        np.save(folder_path + 'Preds real_prediction.npy', preds)
+        np.save(folder_path + 'true_values.npy', true_values)
 
+        print(f'''The Results of Prediction for The Next {self.args.pred_len} Days Are 
+                    Now Stored in {true_save_path} for The True values and 
+                                    {pred_save_path} for the Predictions''')
         return
