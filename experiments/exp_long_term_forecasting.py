@@ -2,6 +2,7 @@ from data_provider.data_factory import data_provider
 from experiments.exp_basic import Exp_Basic
 from utils.tools import EarlyStopping, adjust_learning_rate, visual
 from utils.metrics import metric
+from utils.criter import WeightedMeanAbsolutePercentageError, SymmetricMeanAbsolutePercentageError, RMSELoss,QuantileLoss, HuberLoss, PinballLoss
 import torch
 import torch.nn as nn
 from torch import optim
@@ -20,18 +21,17 @@ class Exp_Long_Term_Forecast(Exp_Basic):
         self.preds_during_training = []
         self.train_losses = []
         self.test_losses = []
-
+    
     def _build_model(self):
         model = self.model_dict[self.args.model].Model(self.args).float()
-
         if self.args.use_multi_gpu and self.args.use_gpu:
             model = nn.DataParallel(model, device_ids=self.args.device_ids)
         return model
-
+    
     def _get_data(self, flag):
         data_set, data_loader = data_provider(self.args, flag)
         return data_set, data_loader
-
+    
     def _select_optimizer(self):
         if self.args.kind_of_optim == 'AdamW':
             model_optim = optim.AdamW(self.model.parameters(), lr=self.args.learning_rate)
