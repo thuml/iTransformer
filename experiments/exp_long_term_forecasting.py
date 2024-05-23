@@ -369,19 +369,19 @@ class Exp_Long_Term_Forecast(Exp_Basic):
 
         preds = np.array(preds)
         preds = preds.reshape(-1, preds.shape[-2], preds.shape[-1])
-
-        true_values = np.concatenate(true_values, axis=0)
+        true_values = np.array(true_values)
+        true_values = true_values.reshape(-1, true_values.shape[-2], true_values.shape[-1])
         # result save
         folder_path = './results/' + setting + '/'
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
 
         pred_save_path = folder_path + 'Preds real_prediction.npy'
-        true_save_path = folder_path + 'true_values.npy'
+        true_save_path = folder_path + 'Trues real_prediction.npy'
         np.save(folder_path + 'Preds real_prediction.npy', preds)
-        np.save(folder_path + 'true_values.npy', true_values)
+        np.save(folder_path + 'Trues real_prediction.npy', true_values)
 
         print(f'''The Results of Prediction for The Next {self.args.pred_len} Days Are 
-                    Now Stored in {true_save_path} for The True values and 
-                                    {pred_save_path} for the Predictions''')
+            Now Stored in {true_save_path} for The True values and 
+                            {pred_save_path} for the Predictions''')
         return
