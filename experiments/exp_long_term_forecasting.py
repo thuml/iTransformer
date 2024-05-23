@@ -370,7 +370,7 @@ class Exp_Long_Term_Forecast(Exp_Basic):
         preds = np.array(preds)
         preds = preds.reshape(-1, preds.shape[-2], preds.shape[-1])
         true_values = np.array(true_values)
-        true_values = true_values.reshape(-1, true_values.shape[-2], true_values.shape[-1])
+        #true_values = true_values.reshape(-1, true_values.shape[-2], true_values.shape[-1])
         # result save
         folder_path = './results/' + setting + '/'
         if not os.path.exists(folder_path):
