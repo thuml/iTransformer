@@ -17,23 +17,25 @@ arg = dotdict()
 
 # NEW OPTIONS : #
 
-arg.test_size = None                 # default is 0.2 which makes the training 0.7 ! #
-arg.kind_of_scaler = None            # default is 'Standard'. Another Option is 'MinMax' (recommended) #
-arg.name_of_col_with_date = None     # default is 'date'. Name of your date column in your dataset #
+arg.scale = True
+
+arg.test_size = 0.2                 # default is 0.2 which makes the training 0.7 ! #
+arg.kind_of_scaler = 'Standard'            # default is 'Standard'. Another Option is 'MinMax' (recommended) #
+arg.name_of_col_with_date = 'date'     # default is 'date'. Name of your date column in your dataset #
 
 arg.kind_of_optim = 'default'        # default is 'Adam'.
-                                     # other options : 'AdamW', 'SparseAdam', 'SGD', 'RMSprop', 'RAdam', 'NAdam' ,'LBFGS',
-                                     #                     'Adamax' 'ASGD' 'Adadelta' 'Adagrad'
+#                                       other options : 'AdamW', 'SparseAdam', 'SGD', 'RMSprop', 'RAdam', 'NAdam' ,'LBFGS',
+#                                                       'Adamax' 'ASGD' 'Adadelta' 'Adagrad'
 
 arg.criter = 'default'               # default is nn.MSELoss ( Mean Squared Error )
-                                     # other options : 'wmape', 'smape', 'mae', 'rmse', 'quantileloss', 'huberloss', 'pinballloss'
+#                                       other options : 'wmape', 'smape', 'mae', 'rmse', 'quantileloss', 'huberloss', 'pinballloss'
 
 # NEW Accessories : #
 
-exp.trues_during_training
-exp.preds_during_training
-exp.train_losses
-exp.test_losses
+#exp.trues_during_training
+#exp.preds_during_training
+#exp.train_losses
+#exp.test_losses
 
 #####################
 
@@ -81,7 +83,7 @@ arg.distil = True                                         # help: whether to use
 
 arg.dropout =  0.01
 
-arg.embed = 'timeF'                                                 # help: time features encoding, options: timeF OR fixed OR learned
+arg.embed = 'learned'                                                 # help: time features encoding, options: timeF OR fixed OR learned
 arg.activation =  'ReLU'                                               # help: Name of activation Function
 
 #arg.output_attention =  None                                           # help: Whether to output attention in ecoder
@@ -90,11 +92,11 @@ arg.activation =  'ReLU'                                               # help: N
 arg.num_workers = 10                                                # help: data loader num workers
 arg.itr = 1                                                         # help: How many times repeat experiments 
 
-arg.train_epochs = 21
+arg.train_epochs = 25
 
 arg.batch_size = 16
 
-arg.patience = 7                                                   # help: early stopping patience
+arg.patience = 10                                                   # help: early stopping patience
 
 arg.learning_rate = 0.00005
 
@@ -114,10 +116,9 @@ arg.exp_name = 'MTSF'
 
 arg.channel_independence =  False                                        # help: whether to use channel_independence mechanism
 
-arg.inverse =  True                                                         # help: inverse output data
+arg.inverse =  False                                                         # help: inverse output data
 
 arg.class_strategy =  'projection'                                        # help: options: projection/average/cls_token
-
 
 
 
@@ -178,6 +179,10 @@ if arg.is_training:
         exp.train(setting)
         
         print('>>>>>>>testing : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))
+        
+        train_losses = exp.train_losses##### --->>> Use These To Plot the Loss Values
+        test_losses = exp.test_losses####   --->>> Use These To Plot the Loss Values
+        
         exp.test(setting)
         
         if arg.do_predict:
@@ -210,4 +215,5 @@ if arg.is_training:
         print('>>>>>>>testing : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))
         exp.test(setting, test=1)
         torch.cuda.empty_cache()
+
 #end#

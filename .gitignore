@@ -2,7 +2,10 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
+test_results/
+checkpoints
+results
+result_long_term_forecast.txt
 # C extensions
 *.so
 

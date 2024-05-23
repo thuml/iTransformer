@@ -328,12 +328,12 @@ class Exp_Long_Term_Forecast(Exp_Basic):
 
     def predict(self, setting, load=False):
         pred_data, pred_loader = self._get_data(flag='pred')
-
+        
         if load:
             path = os.path.join(self.args.checkpoints, setting)
             best_model_path = path + '/' + 'checkpoint.pth'
             self.model.load_state_dict(torch.load(best_model_path))
-
+        
         preds = []
         true_values = []
         
@@ -344,8 +344,7 @@ class Exp_Long_Term_Forecast(Exp_Basic):
                 batch_y = batch_y.float()
                 batch_x_mark = batch_x_mark.float().to(self.device)
                 batch_y_mark = batch_y_mark.float().to(self.device)
-
-                true_values.append(batch_y.cpu().numpy())
+                
                 # decoder input
                 dec_inp = torch.zeros_like(batch_y[:, -self.args.pred_len:, :]).float()
                 dec_inp = torch.cat([batch_y[:, :self.args.label_len, :], dec_inp], dim=1).float().to(self.device)
@@ -362,15 +361,17 @@ class Exp_Long_Term_Forecast(Exp_Basic):
                     else:
                         outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
                 outputs = outputs.detach().cpu().numpy()
+                batch_y = batch_y.detach().cpu().numpy()
                 if pred_data.scale and self.args.inverse:
                     shape = outputs.shape
                     outputs = pred_data.inverse_transform(outputs.squeeze(0)).reshape(shape)
                 preds.append(outputs)
-
+                true_values.append(batch_y)
+        
         preds = np.array(preds)
         preds = preds.reshape(-1, preds.shape[-2], preds.shape[-1])
         true_values = np.array(true_values)
-        #true_values = true_values.reshape(-1, true_values.shape[-2], true_values.shape[-1])
+        true_values = true_values.reshape(-1, true_values.shape[-2], true_values.shape[-1])
         # result save
         folder_path = './results/' + setting + '/'
         if not os.path.exists(folder_path):
