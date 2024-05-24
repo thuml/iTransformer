@@ -82,11 +82,11 @@ class SaveArgs:
         except:
             print("Fail to Save Args")
             return
+        print(f"Args Object Saved to {self.path}")
+        print("It Can be further used by pickle.load()")
+        
     
     def __repr__(self) -> str:
-        return f"""
-    Args Object Saved to {self.path}
-    It Can be further used by pickle.load()
-    """
+        return "cloner174 in github 2024"
     
 #end#
