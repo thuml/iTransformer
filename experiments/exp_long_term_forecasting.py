@@ -10,7 +10,7 @@ import os
 import time
 import warnings
 import numpy as np
-import pickle
+from utils.save_args import SaveArgs
 
 warnings.filterwarnings('ignore')
 
@@ -25,16 +25,12 @@ class Exp_Long_Term_Forecast(Exp_Basic):
         self.trues_during_vali = []
         self.preds_during_vali = []
         if args.is_training != 0:
-            if os.path.exists('input'):
-                path_to_saved_args = 'input/args.pkl'
-            else:
-                path_to_saved_args = 'args.pkl'
-            self.path_to_saved_args = path_to_saved_args
-            with open(path_to_saved_args, 'wb') as f:
-                pickle.dump(args, f)
-            print("Args object saved to args.pkl")
-            print("It Can be further used by pickle.load()")
+            try:
+                SaveArgs(args=args, path='input')
+            except:
+                print("Fail To Save The Args. Continue ..")
             time.sleep(2)
+        
     
     def _build_model(self):
         model = self.model_dict[self.args.model].Model(self.args).float()
