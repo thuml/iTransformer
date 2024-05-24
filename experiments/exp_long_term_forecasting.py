@@ -10,10 +10,12 @@ import os
 import time
 import warnings
 import numpy as np
+import pickle
 
 warnings.filterwarnings('ignore')
 
-
+print("This is The enhanced version of Orginal code, Written in 2024")
+time.sleep(1)
 class Exp_Long_Term_Forecast(Exp_Basic):
     def __init__(self, args):
         super(Exp_Long_Term_Forecast, self).__init__(args)
@@ -22,6 +24,17 @@ class Exp_Long_Term_Forecast(Exp_Basic):
         self.vali_losses = []
         self.trues_during_vali = []
         self.preds_during_vali = []
+        if args.is_training != 0:
+            if os.path.exists('input'):
+                path_to_saved_args = 'input/args.pkl'
+            else:
+                path_to_saved_args = 'args.pkl'
+            self.path_to_saved_args = path_to_saved_args
+            with open(path_to_saved_args, 'wb') as f:
+                pickle.dump(args, f)
+            print("Args object saved to args.pkl")
+            print("It Can be further used by pickle.load()")
+            time.sleep(2)
     
     def _build_model(self):
         model = self.model_dict[self.args.model].Model(self.args).float()
@@ -386,7 +399,8 @@ class Exp_Long_Term_Forecast(Exp_Basic):
                         input = test_data.inverse_transform(input.squeeze(0)).reshape(shape)
                     gt = np.concatenate((input[0, :, -1], true[0, :, -1]), axis=0)
                     pd = np.concatenate((input[0, :, -1], pred[0, :, -1]), axis=0)
-                    visual(gt, pd, os.path.join(folder_path, str(i) + '.pdf'))
+                    if self.args.do_visual:
+                        visual(gt, pd, os.path.join(folder_path, str(i) + '.pdf'))
         
         preds = np.array(preds)
         trues = np.array(trues)
@@ -426,7 +440,6 @@ class Exp_Long_Term_Forecast(Exp_Basic):
             self.model.load_state_dict(torch.load(best_model_path))
         
         preds = []
-        true_values = []
         
         self.model.eval()
         with torch.no_grad():
@@ -453,27 +466,22 @@ class Exp_Long_Term_Forecast(Exp_Basic):
                         outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
                 outputs = outputs.detach().cpu().numpy()
                 batch_y = batch_y.detach().cpu().numpy()
+                self.batch_y = batch_y
                 if pred_data.scale and self.args.inverse:
                     shape = outputs.shape
                     outputs = pred_data.inverse_transform(outputs.squeeze(0)).reshape(shape)
                 preds.append(outputs)
-                true_values.append(batch_y)
         
         preds = np.array(preds)
         preds = preds.reshape(-1, preds.shape[-2], preds.shape[-1])
-        true_values = np.array(true_values)
-        true_values = true_values.reshape(-1, true_values.shape[-2], true_values.shape[-1])
         # result save
         folder_path = './results/' + setting + '/'
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
-
+        
         pred_save_path = folder_path + 'Preds real_prediction.npy'
-        true_save_path = folder_path + 'Trues real_prediction.npy'
         np.save(folder_path + 'Preds real_prediction.npy', preds)
-        np.save(folder_path + 'Trues real_prediction.npy', true_values)
-
-        print(f'''The Results of Prediction for The Next {self.args.pred_len} Days Are 
-            Now Stored in {true_save_path} for The True values and 
-                            {pred_save_path} for the Predictions''')
+        
+        print(f'''The Results of Prediction for The Next {self.args.pred_len} Days Are Now Stored in 
+                {pred_save_path}''')
         return

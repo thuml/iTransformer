@@ -24,16 +24,19 @@ arg.kind_of_scaler = 'Standard'            # default is 'Standard'. Another Opti
 arg.name_of_col_with_date = 'date'     # default is 'date'. Name of your date column in your dataset #
 
 arg.kind_of_optim = 'default'        # default is 'Adam'.
-#                                       other options : 'AdamW', 'SparseAdam', 'SGD', 'RMSprop', 'RAdam', 'NAdam' ,'LBFGS',
-#                                                       'Adamax' 'ASGD' 'Adadelta' 'Adagrad'
+                                    #other options : 'AdamW', 'SparseAdam', 'SGD', 'RMSprop', 'RAdam', 'NAdam' ,'LBFGS',
+                                    # 'Adamax' 'ASGD' 'Adadelta' 'Adagrad'
 
 arg.criter = 'default'               # default is nn.MSELoss ( Mean Squared Error )
-#                                       other options : 'wmape', 'smape', 'mae', 'rmse', 'quantileloss', 'huberloss', 'pinballloss'
+                                        #   other options : 'wmape', 'smape', 'mae', 'rmse', 'quantileloss', 'huberloss', 'pinballloss'
+
+arg.do_visual = False
+arg.max_use_of_row = 'No Lim'#This is for prediction, Other options are: 'All Except a Week' or 'All Except 3 Days'
 
 # NEW Accessories : #
 
-#exp.trues_during_training
-#exp.preds_during_training
+#exp.path_to_saved_args
+#exp.vali_losses
 #exp.train_losses
 #exp.test_losses
 

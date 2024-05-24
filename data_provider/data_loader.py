@@ -481,9 +481,11 @@ class Dataset_Solar(Dataset):
 
 class Dataset_Pred(Dataset):
     def __init__(self, root_path, flag='pred', size=None,
-                    features='S', data_path='data.csv',
+                    features='MS', data_path='data-pred.csv',
                     target='Close', scale=True, inverse=False, timeenc=0, freq='b', cols=None, 
-                    test_size = None, kind_of_scaler = None, name_of_col_with_date = None):
+                    max_use_of_row = 'No Lim',#It also can be 'All Except a Week' or 'All Except 3 Days'
+                    kind_of_scaler = None, 
+                    name_of_col_with_date = None):
         # size [seq_len, label_len, pred_len]
         # info
         if size == None:
@@ -497,7 +499,6 @@ class Dataset_Pred(Dataset):
         # init
         assert flag in ['pred']
         
-        self.test_size = test_size
         self.kind_of_scaler = kind_of_scaler if kind_of_scaler is not None else 'Standard'
         self.name_of_col_with_date = name_of_col_with_date if name_of_col_with_date is not None else 'date'
         self.features = features
@@ -509,6 +510,9 @@ class Dataset_Pred(Dataset):
         self.cols = cols
         self.root_path = root_path
         self.data_path = data_path
+        max_use_of_row = max_use_of_row if max_use_of_row is not None else 'No Lim'
+        self.max_use_of_row = 7 if max_use_of_row.lower() == 'all except a week' else 3 if  max_use_of_row.lower() == 'all except 3 days' else 0
+        
         self.__read_data__()
     
     
@@ -530,8 +534,9 @@ class Dataset_Pred(Dataset):
         cols.insert(0, 'date')
         cols.append(self.target)
         df_raw = df_raw.set_axis(cols, axis=1)
-        border1 = len(df_raw) - self.seq_len
-        border2 = len(df_raw)
+        
+        border1 = len(df_raw) - self.max_use_of_row - self.seq_len
+        border2 = len(df_raw) - self.max_use_of_row
         
         if self.features == 'M' or self.features == 'MS':
             cols_data = df_raw.columns[1:]
