@@ -48,8 +48,8 @@ arg.data = 'custom'                         # help: dataset type
 arg.root_path = 'input/train'                         # help: main directory path of the data file
 arg.data_path =  'data.csv'                      # help: name of data csv file
 
-arg.target_root_path =  'input/test'
-arg.target_data_path = 'data.csv'
+arg.pred_root_path =  'input/test'
+arg.pred_data_path = 'data.csv'
 
 
 arg.features = 'MS'                             # help: forecasting task , options: M ->multivariate predict multivariate , or

@@ -9,7 +9,10 @@ results/test_iTransformer_custom_MS_ft15_sl1_ll3_pl512_dm8_nh8_el8_dl1024_df1_fc
 result_long_term_forecast.txt
 # C extensions
 *.so
-
+/home/user/Documents/Python/Others/iTransformer/input/test/data.csv
+/home/user/Documents/Python/Others/iTransformer/input/test/scaler.pkl
+/home/user/Documents/Python/Others/iTransformer/input/train/data.csv
+/home/user/Documents/Python/Others/iTransformer/input/train/scaler.pkl
 */.DS_Store
 
 # Distribution / packaging
