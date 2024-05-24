@@ -10,7 +10,8 @@ class DotDict:
         try:
             return self.__dict__[attr]
         except KeyError:
-            raise AttributeError(f"'{type(self).__name__}' object has no attribute '{attr}'")
+            self.__setattr__(attr, False)
+            return self.__dict__[attr]
     
     def __setattr__(self, key, value):
         self.__dict__[key] = value
