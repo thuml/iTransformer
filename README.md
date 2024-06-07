@@ -117,7 +117,7 @@ By introducing the proposed framework, Transformer and its variants achieve **si
 <img src="./figures/boosting.png" alt="" align=center />
 </p>
 
-## Generalization on Unseen Variates
+## Zero-shot Generalization on Variates
 
 **Technically, iTransformer can forecast with arbitrary numbers of variables** during inference. We partition the variates of each dataset into five folders, train models with 20% variates, and use the partially trained model to forecast all varieties. iTransformers can be trained efficiently and forecast unseen variates with good generalizability.
 
