@@ -41,9 +41,6 @@ The repo is the official implementation for the paper: [iTransformer: Inverted T
 <img src="./figures/radar.png" height = "360" alt="" align=center />
 </p>
 
-😊 **iTransformer** is repurposed on the vanilla Transformer. We think the "passionate modification" of Transformer has got too much attention in the research area of time series. Hopefully, the mainstream work in the following can focus more on the dataset infrastructure and consider the scale-up ability of Transformer.
-
-
 
 ## Overall Architecture
 
