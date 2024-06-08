@@ -76,4 +76,7 @@ class Model(nn.Module):
         dec_out = self.forecast(x_enc, x_mark_enc, x_dec, x_mark_dec)
         # get probabilities
         dec_out = self.sigmoid(dec_out)
+        # threshold = 0.5
+        # dec_out = (dec_out > threshold).float()
+        print(f"Sigmoid Output: {dec_out}")
         return dec_out[:, -self.pred_len:, :]  # [B, L, D]

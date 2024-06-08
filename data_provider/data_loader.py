@@ -7,6 +7,7 @@ from sklearn.preprocessing import StandardScaler
 from utils.timefeatures import time_features
 import warnings
 
+
 warnings.filterwarnings('ignore')
 
 
@@ -193,7 +194,7 @@ class Dataset_Custom(Dataset):
                  features='S', data_path='ETTh1.csv',
                  target='OT', scale=True, timeenc=0, freq='h'):
         # size [seq_len, label_len, pred_len]
-        # info
+
         if size == None:
             self.seq_len = 24 * 4 * 4
             self.label_len = 24 * 4
@@ -221,6 +222,7 @@ class Dataset_Custom(Dataset):
         self.scaler = StandardScaler()
         df_raw = pd.read_csv(os.path.join(self.root_path,
                                           self.data_path), nrows=1200)
+
 
         '''
         df_raw.columns: ['date', ...(other features), target feature]
