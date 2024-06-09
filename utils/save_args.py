@@ -1,5 +1,6 @@
 # cloner174
 # enhanced version files
+import os
 
 class DotDict:
     
@@ -45,10 +46,9 @@ class SaveArgs:
     def __modify__(self, dict):
         
         try:
-            
             arg_new = self.arg_creator(dict)
         except:
-            print("Fail to Save Args")
+            print("Fail to Save Args - arg_creator")
             return
         
         self.__save__(arg_new)
@@ -56,15 +56,7 @@ class SaveArgs:
     def __path_checker__(self):
         
         try:
-            import os
-            if os.path.exists(self.path):
-                pass
-            else:
-                try:
-                    os.makedirs(self.path)
-                except:
-                    self.path = 'Args.pkl'
-                    return True
+            os.makedirs(self.path, exist_ok=True)
             self.path = os.path.join(self.path, 'Args.pkl')
             return True
         except:
@@ -81,7 +73,7 @@ class SaveArgs:
                 print("Fail to Save Args")
                 return
         except:
-            print("Fail to Save Args")
+            print("Fail to Save Args - __save__")
             return
         print(f"Args Object Saved to {self.path}")
         print("It Can be further used by pickle.load()")
