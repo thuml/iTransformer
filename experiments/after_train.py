@@ -129,7 +129,7 @@ def predict(args, model,
         with torch.no_grad():
             for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(pred_loader):
                 batch_x = batch_x.float().to(exp.device)
-                batch_y = batch_y.float()
+                batch_y = batch_y.float().to(exp.device)
                 batch_x_mark = batch_x_mark.float().to(exp.device)
                 batch_y_mark = batch_y_mark.float().to(exp.device)
                 dec_inp = torch.zeros_like(batch_y[:, -exp.args.pred_len:, :]).float()
