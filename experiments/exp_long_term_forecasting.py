@@ -10,7 +10,7 @@ import os
 import time
 import warnings
 import numpy as np
-from utils.save_args import SaveArgs
+from .pre_train import SaveArgs
 
 warnings.filterwarnings('ignore')
 
