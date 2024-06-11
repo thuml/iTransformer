@@ -1,12 +1,27 @@
+import gpytorch
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from layers.Transformer_EncDec import Encoder, EncoderLayer
 from layers.SelfAttention_Family import FullAttention, AttentionLayer
 from layers.Embed import DataEmbedding_inverted
+from gpytorch.models import ExactGP
+from gpytorch.means import ConstantMean
+from gpytorch.kernels import SpectralMixtureKernel
+from gpytorch.distributions import MultivariateNormal
+
 import numpy as np
 
+class SpectralMixtureGPModel(ExactGP):
+    def __init__(self, train_x, train_y, likelihood):
+        super(SpectralMixtureGPModel, self).__init__(train_x, train_y, likelihood)
+        self.mean_module = ConstantMean()
+        self.covar_module = SpectralMixtureKernel(num_mixtures=4)
 
+    def forward(self, x):
+        mean_x = self.mean_module(x)
+        covar_x = self.covar_module(x)
+        return MultivariateNormal(mean_x, covar_x)
 class Model(nn.Module):
     """
     Paper link: https://arxiv.org/abs/2310.06625
@@ -37,9 +52,11 @@ class Model(nn.Module):
             ],
             norm_layer=torch.nn.LayerNorm(configs.d_model)
         )
-        self.projector = nn.Linear(configs.d_model, configs.pred_len, bias=True)
+        self.likelihood = gpytorch.likelihoods.GaussianLikelihood()
+        self.gp_model = SpectralMixtureGPModel(None, None, self.likelihood)
+        # self.projector = nn.Linear(configs.d_model, configs.pred_len, bias=True)
         # sigmoid for probabilities
-        self.sigmoid = nn.Sigmoid()
+        # self.sigmoid = nn.Sigmoid()
 
     def forecast(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
         if self.use_norm:
@@ -75,8 +92,9 @@ class Model(nn.Module):
     def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec, mask=None):
         dec_out = self.forecast(x_enc, x_mark_enc, x_dec, x_mark_dec)
         # get probabilities
+        print(dec_out)
         dec_out = self.sigmoid(dec_out)
-        # threshold = 0.5
-        # dec_out = (dec_out > threshold).float()
-        print(f"Sigmoid Output: {dec_out}")
-        return dec_out[:, -self.pred_len:, :]  # [B, L, D]
+        print(dec_out)
+        sngp_output = self.sngp_layer(dec_out)
+        return sngp_output[:, -self.pred_len:, :]  # [B, L, D]
+
