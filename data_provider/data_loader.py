@@ -7,6 +7,7 @@ from torch.utils.data import Dataset, DataLoader
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from utils.timefeatures import time_features
 import warnings
+import time
 
 warnings.filterwarnings('ignore')
 
@@ -229,13 +230,20 @@ class Dataset_Custom(Dataset):
         self.name_of_col_with_date = name_of_col_with_date if name_of_col_with_date is not None else 'date'
         self.root_path = root_path
         self.data_path = data_path
+        
+        self.scaler_path = os.path.join('./input', 'Scalers')
+        os.makedirs(self.scaler_path, exist_ok=True)
+        
         self.__read_data__()
 
     def __read_data__(self):
         
-        df_raw = pd.read_csv(os.path.join(self.root_path,
-                                            self.data_path))
-
+        if self.root_path == 'None':
+            df_raw = pd.read_csv(self.data_path)
+        else:
+            df_raw = pd.read_csv(os.path.join(self.root_path,
+                                                self.data_path))
+        
         '''
         df_raw.columns: ['date', ...(other features), target feature]
         '''
@@ -262,6 +270,13 @@ class Dataset_Custom(Dataset):
         elif self.features == 'S':
             df_data = df_raw[[self.target]]
         
+        file_path = self.scaler_path + 'scaler.pkl'
+        if os.path.exists(file_path):
+            base, ext = os.path.splitext(file_path)
+            timestamp = time.strftime("%Y%m%d_%H%M%S")
+            file_path = f"{base}_{timestamp}{ext}"
+        self.scaler_path = file_path
+        
         if self.scale:
             if self.features == 'S' or self.features == 'MS':
                 col_scaled = []
@@ -279,7 +294,7 @@ class Dataset_Custom(Dataset):
                             scaler = StandardScaler()
                     if col == self.target:
                         self.scaler.fit(col_data[border1s[0]:border2s[0]])
-                        joblib.dump(self.scaler, os.path.join(self.root_path, 'scaler.pkl'))
+                        joblib.dump(self.scaler, self.scaler_path)
                         col_temp = self.scaler.transform(col_data)
                     else:
                         scaler.fit(col_data[border1s[0]:border2s[0]])
@@ -513,13 +528,19 @@ class Dataset_Pred(Dataset):
         max_use_of_row = max_use_of_row if max_use_of_row is not None else 'No Lim'
         self.max_use_of_row = 7 if max_use_of_row.lower() == 'all except a week' else 3 if  max_use_of_row.lower() == 'all except 3 days' else 0
         
+        self.scaler_path = os.path.join('./input', 'Scalers')
+        os.makedirs(self.scaler_path, exist_ok=True)
+        
         self.__read_data__()
     
     
     def __read_data__(self):
         self.scaler = StandardScaler()
-        df_raw = pd.read_csv(os.path.join(self.root_path,
-                                            self.data_path))
+        if self.root_path == 'None':
+            df_raw = pd.read_csv(self.data_path)
+        else:
+            df_raw = pd.read_csv(os.path.join(self.root_path,
+                                                self.data_path))
         '''
         df_raw.columns: ['date', ...(other features), target feature]
         '''
@@ -544,6 +565,13 @@ class Dataset_Pred(Dataset):
         elif self.features == 'S':
             df_data = df_raw[[self.target]]
         
+        
+        file_path = self.scaler_path + 'scaler.pkl'
+        if os.path.exists(file_path):
+            base, ext = os.path.splitext(file_path)
+            timestamp = time.strftime("%Y%m%d_%H%M%S")
+            file_path = f"{base}_{timestamp}{ext}"
+        self.scaler_path = file_path
         if self.scale:
             if self.features == 'S' or self.features == 'MS':
                 col_scaled = []
@@ -561,7 +589,7 @@ class Dataset_Pred(Dataset):
                             scaler = StandardScaler()
                     if col == self.target:
                         self.scaler.fit(col_data)
-                        joblib.dump(self.scaler, os.path.join(self.root_path, 'scaler.pkl'))
+                        joblib.dump(self.scaler, self.scaler_path)
                         col_temp = self.scaler.transform(col_data)
                     else:
                         scaler.fit(col_data)

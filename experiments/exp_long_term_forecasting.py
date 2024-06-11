@@ -29,7 +29,7 @@ class Exp_Long_Term_Forecast(Exp_Basic):
                 SaveArgs(args=args, path='input')
             except:
                 print("Fail To Save The Args. Continue ..")
-            time.sleep(2)
+            time.sleep(1)
         
     
     def _build_model(self):

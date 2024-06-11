@@ -31,9 +31,9 @@ def data_provider(args, flag):
             target=args.target,
             timeenc=timeenc,
             freq=freq,
-            kind_of_scaler=args.kind_of_scaler,
-            name_of_col_with_date = args.name_of_col_with_date,
-            scale = args.scale,
+            kind_of_scaler=args.kind_of_scaler if hasattr(args, 'kind_of_scaler') else 'standard',
+            name_of_col_with_date = args.name_of_col_with_date if hasattr(args, 'name_of_col_with_date') else 'date',
+            scale = args.scale if hasattr(args, 'scale') else True,
             max_use_of_row = args.max_use_of_row if hasattr(args, 'max_use_of_row') else 'No Lim',
         )
         print(flag, len(data_set))
@@ -57,10 +57,10 @@ def data_provider(args, flag):
             target=args.target,
             timeenc=timeenc,
             freq=freq,
-            test_size = args.test_size,
-            kind_of_scaler=args.kind_of_scaler,
-            name_of_col_with_date = args.name_of_col_with_date,
-            scale = args.scale,
+            test_size = args.test_size if hasattr(args, 'test_size') else 0.2,
+            kind_of_scaler= args.kind_of_scaler if hasattr(args, 'kind_of_scaler') else 'standard',
+            name_of_col_with_date = args.name_of_col_with_date if hasattr(args, 'name_of_col_with_date') else 'date',
+            scale = args.scale if hasattr(args, 'scale') else True,
         )
         print(flag, len(data_set))
     data_loader = DataLoader(
