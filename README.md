@@ -78,7 +78,7 @@ bash ./scripts/efficient_attentions/iFlashTransformer.sh
 
 ## Main Result of Multivariate Forecasting
 
-We evaluate the iTransformer on challenging multivariate forecasting benchmarks (**generally hundreds of variates**). **Comprehensive good performance** (MSE/MAE) is achieved by iTransformer.
+We evaluate the iTransformer on challenging multivariate forecasting benchmarks (**generally hundreds of variates**). **Comprehensive good performance** (MSE/MAE$\downarrow$) is achieved.
 
 
 ### Challenging Multivariate Time Series Forecasting Benchmarks (Avg Results)
