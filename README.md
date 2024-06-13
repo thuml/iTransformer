@@ -78,11 +78,8 @@ bash ./scripts/efficient_attentions/iFlashTransformer.sh
 
 ## Main Result of Multivariate Forecasting
 
-We evaluate the iTransformer on challenging multivariate forecasting benchmarks (**generally hundreds of variates**, denoted as *Dim*). **Comprehensive good performance** (MSE/MAE) is achieved by iTransformer. iTransformer is particularly good at forecasting high-dimensional time series.
+We evaluate the iTransformer on challenging multivariate forecasting benchmarks (**generally hundreds of variates**). **Comprehensive good performance** (MSE/MAE) is achieved by iTransformer.
 
-<p align="center">
-<img src="./figures/datasets.png" alt="" align=center />
-</p>
 
 ### Challenging Multivariate Time Series Forecasting Benchmarks (Avg Results)
 
