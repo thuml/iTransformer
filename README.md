@@ -174,6 +174,8 @@ We appreciate the following GitHub repos a lot for their valuable code and effor
 - Stationary (https://github.com/thuml/Nonstationary_Transformers)
 - Time-Series-Library (https://github.com/thuml/Time-Series-Library)
 
+This work was supported by Ant Group through the CCF-Ant Research Fund. 
+
 ## Contact
 
 If you have any questions or want to use the code, feel free to contact:
