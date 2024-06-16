@@ -100,7 +100,7 @@ def generate_data(num_examples):
         months = np.random.randint(1, 13, size=4) # Monate (1-12)
         years = np.full(4, 2023)                  # Jahr (fest auf 2023 gesetzt)
 
-        example = list(zip(hours, days, months, years))
+        example = [[hour, day, month, year] for hour, day, month, year in zip(hours, days, months, years)]
         data.append(example)
 
     print("Generated synthetic data:")
