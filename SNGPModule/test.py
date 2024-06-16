@@ -29,17 +29,81 @@ class NeuralNetworkSNGP(nn.Module):
 
 
 
+
+import pandas as pd
+
+data = {
+    'evse_id': ['0', '1', '2', '3', '4'],
+    'connection_time': [
+        '2023-06-01 00:05:00',
+        '2023-06-01 00:30:00',
+        '2023-06-01 00:45:00',
+        '2023-06-01 01:10:00',
+        '2023-06-01 01:35:00'
+    ],
+    'disconnection_time': [
+        '2023-06-01 00:20:00',
+        '2023-06-01 00:45:00',
+        '2023-06-01 01:00:00',
+        '2023-06-01 01:30:00',
+        '2023-06-01 01:50:00'
+    ]
+}
+
+df = pd.DataFrame(data)
+df['connection_time'] = pd.to_datetime(df['connection_time'])
+df['disconnection_time'] = pd.to_datetime(df['disconnection_time'])
+
+start_time = df['connection_time'].min().floor('15T')
+end_time = df['disconnection_time'].max().ceil('15T')
+time_intervals = pd.date_range(start=start_time, end=end_time, freq='15T')
+
+evse_ids = df['evse_id'].unique()
+time_index = pd.MultiIndex.from_product([evse_ids, time_intervals], names=['evse_id', 'time_interval'])
+
+occupancy_df = pd.DataFrame(index=time_index).reset_index()
+
+def determine_occupancy(evse_id, interval_start, interval_end):
+    is_occupied = ((df['evse_id'] == evse_id) &
+                   (df['connection_time'] < interval_end) &
+                   (df['disconnection_time'] > interval_start)).any()
+    return is_occupied
+
+occupancy_df['occupancy'] = occupancy_df.apply(
+    lambda row: determine_occupancy(row['evse_id'], row['time_interval'], row['time_interval'] + pd.Timedelta('15 minutes')),
+    axis=1
+)
+
+occupancy_df['site_id'] = occupancy_df['evse_id'].str[0]
+
+occupancy_df['hour'] = occupancy_df['time_interval'].dt.hour
+occupancy_df['day'] = occupancy_df['time_interval'].dt.day
+occupancy_df['month'] = occupancy_df['time_interval'].dt.month
+occupancy_df['year'] = occupancy_df['time_interval'].dt.year
+
+pivot_df = occupancy_df.pivot_table(index=['time_interval', 'hour', 'day', 'month', 'year'], columns='evse_id', values='occupancy').reset_index()
+pivot_df.columns.name = None
+pivot_df = pivot_df.fillna(False)
+print(pivot_df)
 # Example time series data (replace with your actual data)
 # Each sample has 50 timesteps and 2 features
-data = torch.randn(100, 50, 2)
-# Labels for each time series
-labels = torch.randint(0, 3, size=(100,))
+# Ihre Daten in geeigneten Format bringen
+data = [
+    [0, 1, 6, 2023], [0, 1, 6, 2023], [0, 1, 6, 2023], [0, 1, 6, 2023]
+]
+targets = [
+    [1.0, 0.0, 0.0, 0.0, 0.0], [1.0, 0.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0, 0.0]
+]
+data = torch.tensor(data, dtype=torch.float32)
+targets = torch.tensor(targets, dtype=torch.float32)
 
-dataset = TensorDataset(data, labels)
-dataloader = DataLoader(dataset, batch_size=32, shuffle=True)
+# TensorDataset und DataLoader erstellen
+dataset = TensorDataset(data, targets)
+dataloader = DataLoader(dataset, batch_size=2, shuffle=True)
+
 
 # Define the model with appropriate input size
-model = NeuralNetworkSNGP(2, 64, 3)  # Assuming 2 features and 3 classes
+model = NeuralNetworkSNGP(4, 64, 5)  # Assuming 2 features and 3 classes
 
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
@@ -59,7 +123,7 @@ for epoch in range(10):
     if i % 50 == 0:
       print(f"Epoch: {epoch+1}, Step: {i}, Loss: {loss.item():.4f}")
 
-new_data = torch.randn(1, 50, 2)
+new_data = torch.tensor([[0, 1, 6, 2023]], dtype=torch.float32)
 prediction = model(new_data).argmax(dim=1)
 print(prediction)
 predicted_class = prediction.argmax(dim=1).item()
