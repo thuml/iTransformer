@@ -85,9 +85,10 @@ pivot_df = occupancy_df.pivot_table(index=['time_interval', 'hour', 'day', 'mont
 pivot_df.columns.name = None
 pivot_df = pivot_df.fillna(False)
 print(pivot_df)
-# Example time series data (replace with your actual data)
-# Each sample has 50 timesteps and 2 features
-# Ihre Daten in geeigneten Format bringen
+
+num_of_targets= 5
+num_of_inputs = 4
+
 data = [
     [0, 1, 6, 2023], [0, 1, 6, 2023], [0, 1, 6, 2023], [0, 1, 6, 2023]
 ]
@@ -103,7 +104,7 @@ dataloader = DataLoader(dataset, batch_size=2, shuffle=True)
 
 
 # Define the model with appropriate input size
-model = NeuralNetworkSNGP(4, 64, 5)  # Assuming 2 features and 3 classes
+model = NeuralNetworkSNGP(num_of_inputs, 64, num_of_targets)
 
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
@@ -113,8 +114,8 @@ for epoch in range(10):
     optimizer.zero_grad()
     logits = model(timeseries)
 
-    labels = F.one_hot(labels, num_classes=3)  # One-hot encode labels with 3 classes
-    labels = labels.view(labels.size(0), 3)  # Reshape to [batch_size, num_classes]
+    labels = F.one_hot(labels, num_classes=num_of_targets)  # One-hot encode labels with 3 classes
+    labels = labels.view(labels.size(0), num_of_targets)  # Reshape to [batch_size, num_classes]
     loss = criterion(logits, labels)
     loss.backward()
     optimizer.step()
