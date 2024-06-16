@@ -6,6 +6,8 @@ import torch
 from torch import nn
 from torch.utils.data import TensorDataset, DataLoader
 import torch.nn.functional as F
+import numpy as np
+
 
 
 class NeuralNetworkSNGP(nn.Module):
@@ -88,23 +90,30 @@ print(pivot_df)
 
 num_of_targets= 5
 num_of_inputs = 4
+def generate_data(num_examples):
 
-data = [[
-    [0, 1, 6, 2023], [0, 1, 6, 2023], [0, 1, 6, 2023], [0, 1, 6, 2023]
-],
-[
-    [3, 2, 6, 2023], [1, 2, 6, 2023], [4, 2, 6, 2023], [2, 2, 6, 2023]
-],
-[
-    [4, 3, 6, 2023], [1, 3, 6, 2023], [2, 3, 6, 2023], [5, 3, 6, 2023]
-],
-]
-data = torch.tensor(data)
-targets = [
-    [1.0, 0.0, 0.0, 0.0, 0.0], [1.0, 0.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0, 0.0]
-]
+    # Synthetische Daten erstellen
+    data = []
+    for _ in range(num_examples):
+        hours = np.random.randint(0, 24, size=4)  # Stunden (0-23)
+        days = np.random.randint(1, 32, size=4)   # Tage (1-31)
+        months = np.random.randint(1, 13, size=4) # Monate (1-12)
+        years = np.full(4, 2023)                  # Jahr (fest auf 2023 gesetzt)
+
+        example = list(zip(hours, days, months, years))
+        data.append(example)
+
+    print("Generated synthetic data:")
+    for example in data:
+        print(example)
+    return data
+
+
+data = generate_data(10)
+
 data = torch.tensor(data, dtype=torch.float32)
-targets = torch.tensor(targets, dtype=torch.float32)
+targets = torch.randint(0, num_of_targets, size=(data.size(0),))
+
 
 # TensorDataset und DataLoader erstellen
 dataset = TensorDataset(data, targets)
@@ -122,7 +131,7 @@ for epoch in range(10):
     optimizer.zero_grad()
     logits = model(timeseries)
 
-    labels = F.one_hot(labels, num_classes=num_of_targets)  # One-hot encode labels with 3 classes
+    labels = F.one_hot(labels, num_classes=num_of_targets)
     labels = labels.view(labels.size(0), num_of_targets)  # Reshape to [batch_size, num_classes]
     loss = criterion(logits, labels)
     loss.backward()
@@ -132,10 +141,13 @@ for epoch in range(10):
     if i % 50 == 0:
       print(f"Epoch: {epoch+1}, Step: {i}, Loss: {loss.item():.4f}")
 
-new_data = torch.tensor([[0, 1, 6, 2023]], dtype=torch.float32)
+new_data = generate_data(10)
+new_data = torch.tensor(new_data, dtype=torch.float32)
+
+
 prediction = model(new_data).argmax(dim=1)
 print(prediction)
-predicted_class = prediction.argmax(dim=1).item()
+predicted_class = prediction.argmax(dim=1)
 print(f"Predicted class for new data: {predicted_class}")
 
 
