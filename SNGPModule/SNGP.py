@@ -16,7 +16,7 @@ from torch.nn import functional as F
 from nlp_uncertainty_zoo.utils.custom_types import Device, WandBRun
 
 
-class SNGPModule(nn.Module):
+class SNGP(nn.Module):
     """
     Spectral-normalized Gaussian Process output layer, as presented in
     `Liu et al. (2020) <https://arxiv.org/pdf/2006.10108.pdf>`_. Requires underlying model to contain residual
@@ -36,7 +36,7 @@ class SNGPModule(nn.Module):
         **build_params,
     ):
         """
-        Initialize a SNGP output layer.
+        Initialize a SNGPModule output layer.
 
         Parameters
         ----------
@@ -47,17 +47,17 @@ class SNGPModule(nn.Module):
         output_size: int
             Size of output layer, so number of classes.
         ridge_factor: float
-            Factor that identity sigma hat matrices of the SNGP layer are multiplied by.
+            Factor that identity sigma hat matrices of the SNGPModule layer are multiplied by.
         scaling_coefficient: float
-            Momentum factor that is used when updating the sigma hat matrix of the SNGP layer during the last training
+            Momentum factor that is used when updating the sigma hat matrix of the SNGPModule layer during the last training
             epoch.
         beta_length_scale: float
-            Factor for the variance parameter of the normal distribution all beta parameters of the SNGP layer are
+            Factor for the variance parameter of the normal distribution all beta parameters of the SNGPModule layer are
             initialized from.
         kernel_amplitude: float
             Kernel amplitude used when computing GP features.
         num_predictions: int
-            Number of predictions sampled from the GP in the SNGP layer to come to the final prediction.
+            Number of predictions sampled from the GP in the SNGPModule layer to come to the final prediction.
         device: Device
             Device the replication is performed on.
         """
@@ -125,7 +125,7 @@ class SNGPModule(nn.Module):
         self, x: torch.FloatTensor
     ) -> torch.FloatTensor:
         """
-        Forward pass for SNGP layer.
+        Forward pass for SNGPModule layer.
 
         Parameters
         ----------
@@ -172,7 +172,7 @@ class SNGPModule(nn.Module):
         x: torch.FloatTensor
             Last hidden state of underlying model.
         num_predictions: Optional[int]
-            Number of predictions sampled from the GP in the SNGP layer to come to the final prediction. If None, number
+            Number of predictions sampled from the GP in the SNGPModule layer to come to the final prediction. If None, number
             specified during initialization is used.
 
         Returns
@@ -197,7 +197,7 @@ class SNGPModule(nn.Module):
         x: torch.LongTensor
             Input to the model, containing all token IDs of the current batch.
         num_predictions: int
-            Number of predictions sampled from the GP in the SNGP layer to come to the final prediction. If None, number
+            Number of predictions sampled from the GP in the SNGPModule layer to come to the final prediction. If None, number
             specified during initialization is used.
 
         Returns

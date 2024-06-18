@@ -1,7 +1,4 @@
-import torch
-from torch import nn
-
-from SNGPModule import SNGPModule
+from SNGP import SNGP
 import torch
 from torch import nn
 from torch.utils.data import TensorDataset, DataLoader
@@ -14,18 +11,18 @@ class NeuralNetworkSNGP(nn.Module):
   def __init__(self, input_size, hidden_size, num_classes):
     super(NeuralNetworkSNGP, self).__init__()
     # Define hidden layers (replace with your desired architecture)
-    self.fc1 = nn.Linear(input_size, hidden_size)
+    self.fc1 = nn.utils.spectral_norm(nn.Linear(input_size, hidden_size))
     self.relu = nn.ReLU()
-    self.fc2 = nn.Linear(hidden_size, hidden_size)
-    # SNGP layer with relevant parameters
-    self.sngp = SNGPModule(hidden_size, num_classes, 0.1, 1.0, 1.0, 1.0, 5, torch.device("cpu"))
+    self.fc2 = nn.utils.spectral_norm(nn.Linear(hidden_size, hidden_size))
+    # SNGPModule layer with relevant parameters
+    self.sngp = SNGP(hidden_size, num_classes, 0.1, 1.0, 1.0, 1.0, 5, torch.device("cpu"))
 
   def forward(self, x):
     # Pass through hidden layers
     x = self.fc1(x)
     x = self.relu(x)
     x = self.fc2(x)
-    # Pass to SNGP layer for prediction
+    # Pass to SNGPModule layer for prediction
     logits = self.sngp(x)
     return logits
 
@@ -88,7 +85,7 @@ pivot_df.columns.name = None
 pivot_df = pivot_df.fillna(False)
 print(pivot_df)
 
-num_of_targets= 5
+num_of_targets= 8
 num_of_inputs = 4
 def generate_data(num_examples):
 
@@ -141,13 +138,15 @@ for epoch in range(10):
     if i % 50 == 0:
       print(f"Epoch: {epoch+1}, Step: {i}, Loss: {loss.item():.4f}")
 
-new_data = generate_data(10)
+new_data = generate_data(2)
 new_data = torch.tensor(new_data, dtype=torch.float32)
 
 
-prediction = model(new_data).argmax(dim=1)
-print(prediction)
-predicted_class = prediction.argmax(dim=1)
-print(f"Predicted class for new data: {predicted_class}")
+prediction = model(new_data)
+sigmoid_probs = torch.sigmoid(prediction)  
+
+print(sigmoid_probs)
+predicted_class = sigmoid_probs.argmax(dim=1)
+print(f"Predicted class for new data:\n {predicted_class}")
 
 
