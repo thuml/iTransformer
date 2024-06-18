@@ -1,16 +1,7 @@
-import gpytorch
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
 from layers.Transformer_EncDec import Encoder, EncoderLayer
 from layers.SelfAttention_Family import FullAttention, AttentionLayer
 from layers.Embed import DataEmbedding_inverted
-from gpytorch.models import ExactGP
-from gpytorch.means import ConstantMean
-from gpytorch.kernels import SpectralMixtureKernel
-from gpytorch.distributions import MultivariateNormal
 
-import numpy as np
 
 # STD
 import math
@@ -275,17 +266,6 @@ class SNGP(nn.Module):
             for k in range(self.output_size)
         ]
 
-
-class SpectralMixtureGPModel(ExactGP):
-    def __init__(self, train_x, train_y, likelihood):
-        super(SpectralMixtureGPModel, self).__init__(train_x, train_y, likelihood)
-        self.mean_module = ConstantMean()
-        self.covar_module = SpectralMixtureKernel(num_mixtures=4)
-
-    def forward(self, x):
-        mean_x = self.mean_module(x)
-        covar_x = self.covar_module(x)
-        return MultivariateNormal(mean_x, covar_x)
 class Model(nn.Module):
     """
     Paper link: https://arxiv.org/abs/2310.06625
@@ -314,16 +294,14 @@ class Model(nn.Module):
                     activation=configs.activation
                 ) for l in range(configs.e_layers)
             ],
-            # add spectral normalization
+            # add here spectral normalization?
             norm_layer=torch.nn.LayerNorm(configs.d_model)
         )
-        self.projector = nn.Linear(configs.d_model, configs.pred_len, bias=True)
+        self.projector = nn.utils.spectral_norm(nn.Linear(configs.d_model, configs.pred_len, bias=True))
         self.sngplayer = SNGP(configs.d_model, configs.d_model, 0.1, 1.0, 1.0, 1.0, 5, torch.device("cpu"))
-
 
         # sigmoid for probabilities
         # self.sigmoid = nn.Sigmoid()
-
     def forecast(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
         if self.use_norm:
             # Normalization from Non-stationary Transformer

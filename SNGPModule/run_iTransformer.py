@@ -1,6 +1,6 @@
 import torch
 import numpy as np
-from model.iTransformer import Model, SpectralMixtureGPModel
+from model.iTransformer import Model
 from gpytorch.likelihoods import GaussianLikelihood
 
 class Config:
