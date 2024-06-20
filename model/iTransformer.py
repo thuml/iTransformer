@@ -278,6 +278,7 @@ class Model(nn.Module):
         self.output_attention = configs.output_attention
         self.use_norm = configs.use_norm
         # Embedding
+        # added Spectral normalization into DataEmbedding class
         self.enc_embedding = DataEmbedding_inverted(configs.seq_len, configs.d_model, configs.embed, configs.freq,
                                                     configs.dropout)
         self.class_strategy = configs.class_strategy
@@ -339,5 +340,12 @@ class Model(nn.Module):
         sigmoid = torch.sigmoid(sngp_output)
         # get probabilities
         print(sigmoid)
+        threshold = 0.7
+
+        # Apply the threshold to get binary output
+        binary_output = (sigmoid > threshold).float()
+
+        # Print the binary output
+        print("Binary output:", binary_output)
         return sigmoid[:, -self.pred_len:, :]  # [B, L, D]
 
