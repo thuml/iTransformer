@@ -5,6 +5,8 @@ The repo is the official implementation for the paper: [iTransformer: Inverted T
 
 # Updates
 
+:triangular_flag_on_post: **News** (2024.05) Many thanks for the great efforts from [lucidrains](https://github.com/lucidrains/iTransformer). A pip package implements iTransformer variants can be installed via ```pip install iTransformer```
+
 :triangular_flag_on_post: **News** (2024.03) Introduction of our work in [Chinese](https://mp.weixin.qq.com/s/-pvBnA1_NSloNxa6TYXTSg) is available.
 
 :triangular_flag_on_post: **News** (2024.02) iTransformer has been accepted as **ICLR 2024 Spotlight**.
@@ -173,8 +175,9 @@ We appreciate the following GitHub repos a lot for their valuable code and effor
 - Autoformer (https://github.com/thuml/Autoformer)
 - Stationary (https://github.com/thuml/Nonstationary_Transformers)
 - Time-Series-Library (https://github.com/thuml/Time-Series-Library)
+- lucidrains (https://github.com/lucidrains/iTransformer)
 
-This work was supported by Ant Group through the CCF-Ant Research Fund. 
+This work was also supported by Ant Group through the CCF-Ant Research Fund. 
 
 ## Contact
 
