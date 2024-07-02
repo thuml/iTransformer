@@ -123,7 +123,7 @@ class SNGP(nn.Module):
 
     def forward(
         self, x: torch.FloatTensor
-    ) -> torch.FloatTensor:
+    ) -> Tuple[torch.FloatTensor, torch.Tensor]:
         """
         Forward pass for SNGPModule layer.
 
@@ -160,8 +160,8 @@ class SNGP(nn.Module):
                 )
                 self.sigma_hat_inv *= self.scaling_coefficient
                 self.sigma_hat_inv += (1 - self.scaling_coefficient) * PhiPhi
-
-        return logits
+                self.sigma_hat = torch.inverse(self.sigma_hat_inv)
+        return logits, self.sigma_hat
 
     def predict(self, x: torch.FloatTensor, num_predictions: Optional[int] = None):
         """
@@ -242,7 +242,7 @@ class SNGP(nn.Module):
         # n: number of predictions
         logits = torch.einsum("bsk,nkk->bnsk", Phi, beta_samples)
 
-        return logits
+        return logits, self.sigma_hat
 
     def invert_sigma_hat(self) -> None:
         """
@@ -299,7 +299,7 @@ class Model(nn.Module):
             norm_layer=torch.nn.LayerNorm(configs.d_model)
         )
         self.projector = nn.utils.spectral_norm(nn.Linear(configs.d_model, configs.pred_len, bias=True))
-        self.sngplayer = SNGP(configs.d_model, configs.d_model, 0.1, 1.0, 1.0, 1.0, 5, torch.device("cpu"))
+        self.sngplayer = SNGP(configs.d_model, configs.d_model, 0.1, 0.8, 0.7, 1.0, 5, torch.device("cpu"))
 
         # sigmoid for probabilities
         # self.sigmoid = nn.Sigmoid()
@@ -336,7 +336,7 @@ class Model(nn.Module):
 
     def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec, mask=None):
         dec_out = self.forecast(x_enc, x_mark_enc, x_dec, x_mark_dec)
-        sngp_output = self.sngplayer(dec_out)
+        sngp_output, covmat = self.sngplayer(dec_out)
         sigmoid = torch.sigmoid(sngp_output)
         # get probabilities
         print(sigmoid)
@@ -347,5 +347,6 @@ class Model(nn.Module):
 
         # Print the binary output
         print("Binary output:", binary_output)
+        print(covmat)
         return sigmoid[:, -self.pred_len:, :]  # [B, L, D]
 
