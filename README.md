@@ -80,14 +80,8 @@ bash ./scripts/efficient_attentions/iFlashTransformer.sh
 
 ## Main Result of Multivariate Forecasting
 
-We evaluate the iTransformer on challenging multivariate forecasting benchmarks (**generally hundreds of variates**). **Comprehensive good performance** (MSE/MAE$\downarrow$) is achieved.
+We evaluate the iTransformer on challenging multivariate forecasting benchmarks (**generally hundreds of variates**). **Comprehensive good performance** (MSE/MAE $\downarrow$) is achieved.
 
-
-### Challenging Multivariate Time Series Forecasting Benchmarks (Avg Results)
-
-<p align="center">
-<img src="./figures/main_results.png" alt="" align=center />
-</p>
 
 
 ### Online Transaction Load Prediction of Alipay Trading Platform (Avg Results) 
@@ -112,14 +106,6 @@ By introducing the proposed framework, Transformer and its variants achieve **si
 <img src="./figures/generability.png" alt="" align=center />
 </p>
 
-## Better Utilization of Lookback Windows
-
-While previous Transformers do not benefit from the enlarged lookback window. iTransformers show a surprising **improvement with the increasing length of the lookback window**.
-
-<p align="center">
-<img src="./figures/increase_lookback.png" alt="" align=center />
-</p>
-
 ## Model Analysis
 
 Benefiting from inverted Transformer modules: 
@@ -129,28 +115,6 @@ Benefiting from inverted Transformer modules:
 
 <p align="center">
 <img src="./figures/analysis.png" alt="" align=center />
-</p>
-
-- Visualization of the variates from Market and the learned multivariate correlations. Each variate represents the monitored interface values of an application, and the applications can be further grouped into refined categories.
-
-<p align="center">
-<img src="./figures/groups.png" alt="" align=center />
-</p>
-
-## Model Abalations
-
-iTransformer that utilizes attention on variate dimensions and feed-forward on temporal dimension generally achieves the best performance. However, the performance of vanilla Transformer (the third row) performs the worst among these designs, **indicating the disaccord of responsibility when the conventional architecture is adopted**.
-
-<p align="center">
-<img src="./figures/ablations.png" alt="" align=center />
-</p>
-
-## Model Efficiency
-
-We propose a training strategy for high-dimensional time series. While the performance (Left) remains stable on partially trained variates of each batch with the sampled ratios, the memory footprint (Right) of the training process can be cut off significantly.
-
-<p align="center">
-<img src="./figures/efficient.png" alt="" align=center />
 </p>
 
 ## Citation
@@ -184,3 +148,4 @@ This work was also supported by Ant Group through the CCF-Ant Research Fund.
 If you have any questions or want to use the code, feel free to contact:
 * Yong Liu (liuyong21@mails.tsinghua.edu.cn)
 * Haoran Zhang (z-hr20@mails.tsinghua.edu.cn)
+* Tengge Hu (htg21@mails.tsinghua.edu.cn)
