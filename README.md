@@ -98,7 +98,7 @@ By introducing the proposed framework, Transformer and its variants achieve **si
 <img src="./figures/boosting.png" alt="" align=center />
 </p>
 
-## Zero-shot Generalization on Variates
+## Zero-Shot Generalization on Variates
 
 **Technically, iTransformer is able to forecast with arbitrary numbers of variables**. We train iTransformers on partial variates and forecast unseen variates with good generalizability.
 
