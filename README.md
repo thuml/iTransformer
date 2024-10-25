@@ -5,6 +5,8 @@ The repo is the official implementation for the paper: [iTransformer: Inverted T
 
 # Updates
 
+:triangular_flag_on_post: **News** (2024.10) TimeXer, a canonical Transformer for forecasting with exogenous variables, is released. Code is available [here](https://github.com/thuml/TimeXer). 
+
 :triangular_flag_on_post: **News** (2024.05) Many thanks for the great efforts from [lucidrains](https://github.com/lucidrains/iTransformer). A pip package for the usage of iTransformer variants can be simply installed via ```pip install iTransformer```
 
 :triangular_flag_on_post: **News** (2024.03) Introduction of our work in [Chinese](https://mp.weixin.qq.com/s/-pvBnA1_NSloNxa6TYXTSg) is available.
