@@ -5,6 +5,8 @@ The repo is the official implementation for the paper: [iTransformer: Inverted T
 
 # Updates
 
+:triangular_flag_on_post: **News** (2025.1) The application of iTransformer for Green Computing are awarded as [Outstanding Projects of CCF Fund](https://mp.weixin.qq.com/s/PDLNbibZD3kqhcUoNejLfA). Congratulations!
+
 :triangular_flag_on_post: **News** (2024.10) [TimeXer](https://arxiv.org/abs/2402.19072), a canonical Transformer for forecasting with exogenous variables, is released. Code is available [here](https://github.com/thuml/TimeXer). 
 
 :triangular_flag_on_post: **News** (2024.05) Many thanks for the great efforts from [lucidrains](https://github.com/lucidrains/iTransformer). A pip package for the usage of iTransformer variants can be simply installed via ```pip install iTransformer```
