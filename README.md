@@ -145,7 +145,7 @@ We appreciate the following GitHub repos a lot for their valuable code and effor
 - Time-Series-Library (https://github.com/thuml/Time-Series-Library)
 - lucidrains (https://github.com/lucidrains/iTransformer)
 
-This work was also supported by Ant Group through the CCF-Ant Research Fund. 
+This work was supported by Ant Group through the CCF-Ant Research Fund, and awarded as [Outstanding Projects of CCF Fund](https://mp.weixin.qq.com/s/PDLNbibZD3kqhcUoNejLfA).
 
 ## Contact
 
