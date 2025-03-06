@@ -1,6 +1,6 @@
 # RxiTransformer
 
-RxiTransformer is a machine learning model for time series forecasting that combines elements of RLinear with iTransformer. 
+RxiTransformer is a machine learning model for time series forecasting that combines elements of RLinear(https://github.com/plumprc/RTSF) with iTransformer(https://github.com/thuml/iTransformer). 
 
 The source code is almost the same as that of iTransformer.
 
