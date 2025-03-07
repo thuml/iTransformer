@@ -12,3 +12,8 @@ RxiTransformer is a machine learning model for time series forecasting that comb
 # Learnign Rate Scheduler: ReduceLRReverter
 
 # Minor Changes
+
+-exp_basic.py is revised to use added models.
+-exp_reverter.py is added for impelmentation of ReduceLRReverter
+-run_reverter.py is added for impelmentation of ReduceLRReverter
+-requirements.txt is revised and torch is installed by torch.txt
