@@ -15,10 +15,12 @@ RxiTransformer is a machine learning model for time series forecasting that comb
 
 -exp_basic.py is revised to use added models.
 
--exp_reverter.py is added for impelmentation of ReduceLRReverter
+-exp_reverter.py is added for impelmentation of ReduceLRReverter .
 
--run_reverter.py is added for impelmentation of ReduceLRReverter
+-run_reverter.py is added for impelmentation of ReduceLRReverter .
 
--requirements.txt is revised and torch is installed by torch.txt
+-requirements.txt is revised and torch is installed by torch.txt .
 
 -In run.py, "--rev" argument is added.
+
+-exp_long_term_forecasting is changed to measure the time taken for each epochs.
