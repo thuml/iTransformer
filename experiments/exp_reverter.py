@@ -1,6 +1,6 @@
 from data_provider.data_factory import data_provider
 from experiments.exp_basic import Exp_Basic
-from utils.tools import EarlyStopping_v2, visual, clear_directory, SAVE
+from utils.tools import visual, clear_directory, SAVE
 from utils.metrics import metric
 import torch
 import torch.nn as nn
