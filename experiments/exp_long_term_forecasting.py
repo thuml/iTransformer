@@ -162,6 +162,11 @@ class Exp_Long_Term_Forecast(Exp_Basic):
                     loss.backward()
                     model_optim.step()
 
+            # Recording the time taken for the epoch
+            f = open("result_long_term_forecast.txt", 'a')
+            f.write("Epoch: {} cost time: {}".format(epoch + 1, time.time() - epoch_time) + "\n")
+            f.close()
+
             print("Epoch: {} cost time: {}".format(epoch + 1, time.time() - epoch_time))
             train_loss = np.average(train_loss)
             vali_loss = self.vali(vali_data, vali_loader, criterion)

@@ -9,7 +9,7 @@ The main changes are described below.
 RxiTransformer is a machine learning model for time series forecasting that combines elements of RLinear(https://github.com/plumprc/RTSF) with iTransformer(https://github.com/thuml/iTransformer). 
 
 
-# Learnign Rate Scheduler: ReduceLRReverter
+# Learnig Rate Scheduler: ReduceLRReverter
 
 # Minor Changes
 
@@ -20,3 +20,5 @@ RxiTransformer is a machine learning model for time series forecasting that comb
 -run_reverter.py is added for impelmentation of ReduceLRReverter
 
 -requirements.txt is revised and torch is installed by torch.txt
+
+-In run.py, "--rev" argument is added.
