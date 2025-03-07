@@ -10,6 +10,7 @@ from layers.Invertible import RevIN
 
 class Model(nn.Module):
     # Parrarel model of iTransformer and RLinear-CI
+    # Simply added version
 
     def __init__(self, configs):
         super(Model, self).__init__()
@@ -46,13 +47,13 @@ class Model(nn.Module):
         self.rev = RevIN(configs.enc_in) if configs.rev else None
 
     def forecast(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
-        # Saving x_enc
         x_enc_save = x_enc
         
-        #iTransformer
+        # Normalization from RevIN
         if self.use_norm:
-            # Normalization from RevIN
             x_normed = self.rev(x_enc_save, 'norm') if self.rev else x_enc_save
+        
+        #iTransformer
         _, _, N = x_enc.shape # B L N
         # B: batch_size;    E: d_model;    # L: seq_len;    S: pred_len;
         # N: number of variate (tokens), can also includes covariates
@@ -60,20 +61,19 @@ class Model(nn.Module):
         enc_out = self.enc_embedding(x_normed, x_mark_enc)
         enc_out, attns = self.encoder(enc_out, attn_mask=None)
         enc_out = self.projector(enc_out).permute(0, 2, 1)[:, :, :N]
-        if self.use_norm:
-            # De-Normalization from Non-stationary Transformer
-            enc_out = self.rev(enc_out, 'denorm') if self.rev else enc_out
         
-        # RLinear-CI
+        # RLinear-CI        
         x = self.dropout(x_normed)
-        pred = torch.zeros(x.size(0), self.pred_len, x.size(2)).to('cuda')
+        rl_out = torch.zeros(x.size(0), self.pred_len, x.size(2)).to('cuda')
         for idx, proj in enumerate(self.Linear):
-           pred[:, :, idx] = proj(x[:, :, idx])
-        rl_out = self.rev(pred, 'denorm') if self.rev else pred 
-        
+           rl_out[:, :, idx] = proj(x[:, :, idx])
+
         # Add
         out = enc_out*0.5 + rl_out*0.5
 
+        # De-Normalization from RevIN
+        if self.use_norm:
+            out = self.rev(enc_out, 'denorm') if self.rev else out
 
         return out
 

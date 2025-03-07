@@ -10,6 +10,7 @@ from layers.Invertible import RevIN
 
 class Model(nn.Module):
     # Parrarel model of iTransformer and RLinear-CI
+    # Weighted and added version
 
     def __init__(self, configs):
         super(Model, self).__init__()
@@ -46,21 +47,24 @@ class Model(nn.Module):
         self.dropout = nn.Dropout(configs.dropout)
         self.rev = RevIN(configs.enc_in) if configs.rev else None
 
-        # DistributionLayer
+        # DistributionLayer(Weighting and Add)
         distributer = []
         for i in range(configs.enc_in):
             distributer.append(0.5)
         self.distributer = nn.Parameter(torch.tensor(distributer))
 
     def forecast(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
-        # Saving x_enc
         x_enc_save = x_enc
         
-        # Normalization
-        x_normed = self.rev(x_enc_save, 'norm') if self.rev else x_enc_save
+        # Normalization from RevIN
+        if self.use_norm:
+            x_normed = self.rev(x_enc_save, 'norm') if self.rev else x_enc_save
 
         # iTransformer
-        _, _, N = x_enc.shape 
+        _, _, N = x_enc.shape # B L N
+        # B: batch_size;    E: d_model;    # L: seq_len;    S: pred_len;
+        # N: number of variate (tokens), can also includes covariates
+        # B L N -> B S N
         enc_out = self.enc_embedding(x_normed, x_mark_enc)
         enc_out, attns = self.encoder(enc_out, attn_mask=None)
         enc_out = self.projector(enc_out).permute(0, 2, 1)[:, :, :N]
@@ -71,15 +75,15 @@ class Model(nn.Module):
         for idx, proj in enumerate(self.Linear):
            rl_out[:, :, idx] = proj(x[:, :, idx])
         
-        # Add
+        # Wegihting and Add
         out = torch.zeros_like(enc_out)
         for i in range(self.enc_in):
             rate = self.distributer[i]
             out[:, :, i] = enc_out[:, :, i]*rate + rl_out[:, :, i]*(1 - rate)
         
-        # Denormalization
-        out = self.rev(out, 'denorm') if self.rev else out
-
+        # De-Normalization from RevIN
+        if self.use_norm:
+            out = self.rev(enc_out, 'denorm') if self.rev else out
 
         return out
 
