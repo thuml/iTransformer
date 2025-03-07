@@ -2,7 +2,7 @@ import os
 import torch
 from model import Transformer, Informer, Reformer, Flowformer, Flashformer, \
     iTransformer, iInformer, iReformer, iFlowformer, iFlashformer, \
-    RxiTransformer, RxiTransformer2
+    RxiTransformer, RxiTransformer2, RLinearCI
 
 
 class Exp_Basic(object):
@@ -21,6 +21,7 @@ class Exp_Basic(object):
             'iFlashformer': iFlashformer,
             'RxiTransformer': RxiTransformer,
             'RxiTransformer2': RxiTransformer2,
+            'RLinearCI': RLinearCI,
         }
         self.device = self._acquire_device()
         self.model = self._build_model().to(self.device)
