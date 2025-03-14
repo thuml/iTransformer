@@ -4,6 +4,7 @@ import numpy as np
 import torch
 import matplotlib.pyplot as plt
 import pandas as pd
+import shutil
 
 plt.switch_backend('agg')
 
@@ -113,3 +114,31 @@ def adjustment(gt, pred):
 
 def cal_accuracy(y_pred, y_true):
     return np.mean(y_pred == y_true)
+
+
+### Added section #######################################################
+def clear_directory(path):
+    if not os.path.exists(path):
+        print(f"no directory: {path}")
+        return
+
+    if not os.path.isdir(path):
+        print(f"not directory: {path}")
+        return
+
+    # clearing the directory
+    for filename in os.listdir(path):
+        file_path = os.path.join(path, filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except Exception as e:
+            print(f"error:  {file_path} - {e}")
+
+def SAVE(model, optimizer, path, path2):
+    print('SAVE: Saving model ...')
+    torch.save(model.state_dict(), path + '/' + 'checkpoint.pth')
+    torch.save(optimizer.state_dict(), path2 + '/' + 'checkpoint.pth')
+    return None

@@ -1,6 +1,6 @@
 from data_provider.data_factory import data_provider
 from experiments.exp_basic import Exp_Basic
-from utils.tools import EarlyStopping, adjust_learning_rate, visual
+from utils.tools import visual, clear_directory, SAVE
 from utils.metrics import metric
 import torch
 import torch.nn as nn
@@ -87,11 +87,17 @@ class Exp_Long_Term_Forecast(Exp_Basic):
         path = os.path.join(self.args.checkpoints, setting)
         if not os.path.exists(path):
             os.makedirs(path)
+        path2 = os.path.join(self.args.checkpoints2, setting)
+        if not os.path.exists(path2):
+            os.makedirs(path2)
+        best_model_path = path + '/' + 'checkpoint.pth'
+        best_optimizer_path = path2 + '/' + 'checkpoint.pth'
+        clear_directory(best_model_path)
+        clear_directory(best_optimizer_path)
 
         time_now = time.time()
 
         train_steps = len(train_loader)
-        early_stopping = EarlyStopping(patience=self.args.patience, verbose=True)
 
         model_optim = self._select_optimizer()
         criterion = self._select_criterion()
@@ -102,6 +108,11 @@ class Exp_Long_Term_Forecast(Exp_Basic):
         for epoch in range(self.args.train_epochs):
             iter_count = 0
             train_loss = []
+            #####################################################
+            if epoch == 0:
+                lr = self.args.learning_rate
+            print("lerning rate: {}".format(lr))
+            ##################################################### 
 
             self.model.train()
             epoch_time = time.time()
@@ -174,16 +185,41 @@ class Exp_Long_Term_Forecast(Exp_Basic):
 
             print("Epoch: {0}, Steps: {1} | Train Loss: {2:.7f} Vali Loss: {3:.7f} Test Loss: {4:.7f}".format(
                 epoch + 1, train_steps, train_loss, vali_loss, test_loss))
-            early_stopping(vali_loss, self.model, path)
-            if early_stopping.early_stop:
-                print("Early stopping")
-                break
 
-            adjust_learning_rate(model_optim, epoch + 1, self.args)
+            
+            # Added section #######################################################
+            # Score calcuration
+            score = train_loss*(3/4) + vali_loss*(1/4)
+            print("SCORE: {}".format(score))
+
+            if epoch == 0:
+                best_score = score
+
+            # Reverting
+            if score > best_score:
+                print("Score did not improve. Reverting model.")
+                self.model.load_state_dict(torch.load(best_model_path))
+                model_optim.load_state_dict(torch.load(best_optimizer_path))
+                lr *= 0.5
+                for param_group in model_optim.param_groups:
+                    param_group['lr'] = lr                                         
+            # Saving    
+            else:
+                if epoch == 0:
+                    pass
+                else:
+                    print("Score improved.\n{} >>>>> {}".format(best_score, score))
+                SAVE(self.model, model_optim, path, path2)  
+                best_score = score
+                lr *= 0.5
+                for param_group in model_optim.param_groups:
+                    param_group['lr'] = lr               
+
+            print('Updating learning rate to {}.'.format(lr))   
+            ########################################################################            
 
             # get_cka(self.args, setting, self.model, train_loader, self.device, epoch)
 
-        best_model_path = path + '/' + 'checkpoint.pth'
         self.model.load_state_dict(torch.load(best_model_path))
 
         return self.model

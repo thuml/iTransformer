@@ -129,3 +129,12 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+###############################################
+/result_long_term_forecast.txt
+/dataset
+/scripts
+/checkpoints
+/checkpoints2
+/results
+/test_results
