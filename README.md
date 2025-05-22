@@ -55,7 +55,7 @@ The pseudo-code of iTransformer is as simple as the following:
 
 ## Usage 
 
-1. Install Pytorch and necessary dependencies.
+1. Install Pytorch and the necessary dependencies.
 
 ```
 pip install -r requirements.txt
@@ -72,7 +72,7 @@ bash ./scripts/multivariate_forecasting/Traffic/iTransformer.sh
 # Compare the performance of Transformer and iTransformer
 bash ./scripts/boost_performance/Weather/iTransformer.sh
 
-# Train the model with partial variates, and generalize on the unseen variates
+# Train the model with partial variates, and generalize to the unseen variates
 bash ./scripts/variate_generalization/ECL/iTransformer.sh
 
 # Test the performance on the enlarged lookback window
@@ -145,7 +145,7 @@ We appreciate the following GitHub repos a lot for their valuable code and effor
 - Time-Series-Library (https://github.com/thuml/Time-Series-Library)
 - lucidrains (https://github.com/lucidrains/iTransformer)
 
-This work was supported by Ant Group through the CCF-Ant Research Fund, and awarded as [Outstanding Projects of CCF Fund](https://mp.weixin.qq.com/s/PDLNbibZD3kqhcUoNejLfA).
+This work was supported by Ant Group through the CCF-Ant Research Fund and awarded as [Outstanding Projects of CCF Fund](https://mp.weixin.qq.com/s/PDLNbibZD3kqhcUoNejLfA).
 
 ## Contact
 
