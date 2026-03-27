@@ -1,3 +1,6 @@
+PROJECT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../.." >/dev/null 2>&1 && pwd )"
+source "$PROJECT_ROOT/scripts/setup_env.sh"
+
 # export CUDA_VISIBLE_DEVICES removed; setup_env.sh controls device assignment
 model_name=iTransformer
 # model_name=Transformer

@@ -1,8 +1,9 @@
 #!/bin/bash
 # setup_env.sh (Micromamba)
 
-# 1. Dynamically find the project root directory
-PROJECT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+# 1. Dynamically find the repository root directory
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+PROJECT_ROOT="$( cd "$SCRIPT_DIR/.." &> /dev/null && pwd )"
 
 # 2. Define Micromamba paths (keeping everything isolated inside your repo)
 MAMBA_BIN_DIR="$PROJECT_ROOT/micromamba_bin"
