@@ -92,7 +92,7 @@ class Exp_Long_Term_Forecast_MF(Exp_Basic):
 
         return dec_inp
 
-    def _slice_pred_targets(self, batch_y: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
+    def _slice_targets(self, batch_y: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
         """Extract per-frequency prediction horizon targets from decoder-format targets."""
         targets = {}
         pred_lens = getattr(self.args, 'mf_pred_lens_map', {})
@@ -114,7 +114,7 @@ class Exp_Long_Term_Forecast_MF(Exp_Basic):
                 outputs = outputs[0]
         return outputs
 
-    def _compute_mf_loss(self, outputs, targets, criterion):
+    def _compute_loss(self, outputs, targets, criterion):
         """Aggregate weighted loss over all configured MF frequency heads."""
         loss = 0.0
         loss_weights = getattr(self.args, 'mf_loss_weights_map', {})
@@ -135,9 +135,9 @@ class Exp_Long_Term_Forecast_MF(Exp_Basic):
                     batch_x, batch_y, batch_x_mark, batch_y_mark
                 )
                 dec_inp = self._build_dec_input(batch_y)
-                targets = self._slice_pred_targets(batch_y)
+                targets = self._slice_targets(batch_y)
                 outputs = self._forward_pass(batch_x, batch_x_mark, dec_inp, batch_y_mark)
-                loss = self._compute_mf_loss(outputs, targets, criterion)
+                loss = self._compute_loss(outputs, targets, criterion)
                 total_loss.append(loss.item())
 
         total_loss = np.average(total_loss)
@@ -178,9 +178,9 @@ class Exp_Long_Term_Forecast_MF(Exp_Basic):
                     batch_x, batch_y, batch_x_mark, batch_y_mark
                 )
                 dec_inp = self._build_dec_input(batch_y)
-                targets = self._slice_pred_targets(batch_y)
+                targets = self._slice_targets(batch_y)
                 outputs = self._forward_pass(batch_x, batch_x_mark, dec_inp, batch_y_mark)
-                loss = self._compute_mf_loss(outputs, targets, criterion)
+                loss = self._compute_loss(outputs, targets, criterion)
                 train_loss.append(loss.item())
 
                 if (i + 1) % 100 == 0:
@@ -224,8 +224,8 @@ class Exp_Long_Term_Forecast_MF(Exp_Basic):
             print('loading model')
             self.model.load_state_dict(torch.load(os.path.join('./checkpoints/' + setting, 'checkpoint.pth')))
 
-        mf_preds = {}
-        mf_trues = {}
+        preds = {}
+        trues = {}
 
         self.model.eval()
         with torch.no_grad():
@@ -234,15 +234,15 @@ class Exp_Long_Term_Forecast_MF(Exp_Basic):
                     batch_x, batch_y, batch_x_mark, batch_y_mark
                 )
                 dec_inp = self._build_dec_input(batch_y)
-                targets = self._slice_pred_targets(batch_y)
+                targets = self._slice_targets(batch_y)
                 outputs = self._forward_pass(batch_x, batch_x_mark, dec_inp, batch_y_mark)
 
                 for f_key, pred in outputs.items():
-                    if f_key not in mf_preds:
-                        mf_preds[f_key] = []
-                        mf_trues[f_key] = []
-                    mf_preds[f_key].append(pred.detach().cpu().numpy())
-                    mf_trues[f_key].append(targets[f_key].detach().cpu().numpy())
+                    if f_key not in preds:
+                        preds[f_key] = []
+                        trues[f_key] = []
+                    preds[f_key].append(pred.detach().cpu().numpy())
+                    trues[f_key].append(targets[f_key].detach().cpu().numpy())
 
         folder_path = './results/' + setting + '/'
         if not os.path.exists(folder_path):
@@ -250,19 +250,19 @@ class Exp_Long_Term_Forecast_MF(Exp_Basic):
 
         f = open('result_long_term_forecast.txt', 'a')
         f.write(setting + ' (MF)\n')
-        for f_key in mf_preds:
-            pred_np = np.array(mf_preds[f_key])
-            true_np = np.array(mf_trues[f_key])
-            pred_np = pred_np.reshape(-1, pred_np.shape[-2], pred_np.shape[-1])
-            true_np = true_np.reshape(-1, true_np.shape[-2], true_np.shape[-1])
+        for f_key in preds:
+            preds_np = np.array(preds[f_key])
+            trues_np = np.array(trues[f_key])
+            preds_np = preds_np.reshape(-1, preds_np.shape[-2], preds_np.shape[-1])
+            trues_np = trues_np.reshape(-1, trues_np.shape[-2], trues_np.shape[-1])
 
-            mae, mse, rmse, mape, mspe = metric(pred_np, true_np)
+            mae, mse, rmse, mape, mspe = metric(preds_np, trues_np)
             print('[{}] mse:{}, mae:{}'.format(f_key, mse, mae))
             f.write('[{}] mse:{}, mae:{}\n'.format(f_key, mse, mae))
 
             np.save(folder_path + 'metrics_{}.npy'.format(f_key), np.array([mae, mse, rmse, mape, mspe]))
-            np.save(folder_path + 'pred_{}.npy'.format(f_key), pred_np)
-            np.save(folder_path + 'true_{}.npy'.format(f_key), true_np)
+            np.save(folder_path + 'pred_{}.npy'.format(f_key), preds_np)
+            np.save(folder_path + 'true_{}.npy'.format(f_key), trues_np)
         f.write('\n')
         f.close()
 
@@ -291,8 +291,8 @@ class Exp_Long_Term_Forecast_MF(Exp_Basic):
                     os.makedirs(folder_path)
 
                 for f_key, pred in outputs.items():
-                    pred_np = pred.detach().cpu().numpy()
-                    np.save(folder_path + 'real_prediction_{}.npy'.format(f_key), pred_np)
+                    preds_np = pred.detach().cpu().numpy()
+                    np.save(folder_path + 'real_prediction_{}.npy'.format(f_key), preds_np)
                 return
 
         return

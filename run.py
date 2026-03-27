@@ -47,6 +47,22 @@ def _prepare_mf_args(args):
 
     return args
 
+
+def _validate_experiment_pairing(args):
+    """
+    Validate experiment name and model compatibility.
+    Raises ValueError on invalid combination.
+    """
+    # Multi-frequency experiment requires the mixed-frequency model
+    if args.exp_name == 'multi_train' and args.model != 'MfITransformer':
+        raise ValueError("exp_name 'multi_train' requires --model MfITransformer.")
+
+    # MfITransformer is only meaningful when running the multi-frequency experiment
+    if args.model == 'MfITransformer' and args.exp_name != 'multi_train':
+        raise ValueError("model 'MfITransformer' requires --exp_name multi_train.")
+
+    return True
+
 if __name__ == '__main__':
     fix_seed = 2023
     random.seed(fix_seed)
@@ -160,6 +176,9 @@ if __name__ == '__main__':
 
     print('Args in experiment:')
     print(args)
+
+    # Validate that selected experiment and model are compatible
+    _validate_experiment_pairing(args)
 
     if args.exp_name == 'partial_train': # See Figure 8 of our paper, for the detail
         Exp = Exp_Long_Term_Forecast_Partial

@@ -11,21 +11,10 @@ class MfITransformer(nn.Module):
     """
     Paper link: https://arxiv.org/abs/2310.06625
     Extended for multi-frequency datasets.
-
-    MF path design:
-    - Per-frequency encoder and decoder embedders.
-    - One shared iTransformer encoder.
-    - One shared decoder.
-    - Per-frequency output projection heads.
-
-    This keeps parameter growth controlled while making MF behavior
-    architecturally comparable to single-frequency encoder-decoder flows.
     """
 
     def __init__(self, configs):
         super(MfITransformer, self).__init__()
-        # NEW: Expecting configs.seq_len_list to be a list of sequence lengths for different sample rates
-        # Example: [96, 192, 384] for 1h, 30m, 15m resolutions
         self.seq_len_list = getattr(configs, 'seq_len_list', [configs.seq_len])
         self.pred_len = configs.pred_len
         self.output_attention = configs.output_attention
@@ -36,13 +25,11 @@ class MfITransformer(nn.Module):
         self.mf_seq_lens = getattr(configs, 'mf_seq_lens_map', {})
         self.mf_pred_lens = getattr(configs, 'mf_pred_lens_map', {})
 
-        # Legacy path (single tensor input)
         self.enc_embeddings = nn.ModuleList([
             DataEmbedding_inverted(s_len, configs.d_model, configs.embed, configs.freq, configs.dropout)
             for s_len in self.seq_len_list
         ])
 
-        # Multi-frequency path (dict input): one embedder/projector per frequency key.
         if self.mf_enable and self.mf_freqs:
             self.enc_embeddings_mf = nn.ModuleDict({
                 f_key: DataEmbedding_inverted(
@@ -114,51 +101,51 @@ class MfITransformer(nn.Module):
         )
         self.projector = nn.Linear(configs.d_model, configs.pred_len, bias=True)
 
-    def _forecast_mf(
+    def forecast_mf(
         self,
-        x_enc_dict: Dict[str, torch.Tensor],
-        x_mark_dict: Optional[Dict[str, torch.Tensor]],
-        dec_inp_dict: Dict[str, torch.Tensor],
-        y_mark_dict: Optional[Dict[str, torch.Tensor]],
+        x_enc: Dict[str, torch.Tensor],
+        x_mark_enc: Optional[Dict[str, torch.Tensor]],
+        x_dec: Dict[str, torch.Tensor],
+        x_mark_dec: Optional[Dict[str, torch.Tensor]],
     ) -> Tuple[Dict[str, torch.Tensor], Dict[str, list]]:
         """Forecast per frequency with shared encoder/decoder and per-frequency heads.
 
-        `x_enc_dict`, `dec_inp_dict`, and marks are dicts keyed by frequency.
+        `x_enc`, `x_dec`, and marks are dicts keyed by frequency.
         Each frequency runs through the same encoder/decoder modules sequentially,
         producing separate encoder states and decoder outputs per key.
         """
-        outputs = {}
+        dec_out = {}
         attn_dict = {}
         means_map = {}
         stdev_map = {}
 
         for f_key in self.mf_freqs:
-            if f_key not in x_enc_dict:
-                raise ValueError('Missing frequency key in x_enc_dict: {}'.format(f_key))
-            if f_key not in dec_inp_dict:
-                raise ValueError('Missing frequency key in dec_inp_dict: {}'.format(f_key))
+            if f_key not in x_enc:
+                raise ValueError('Missing frequency key in x_enc: {}'.format(f_key))
+            if f_key not in x_dec:
+                raise ValueError('Missing frequency key in x_dec: {}'.format(f_key))
 
-            x_freq = x_enc_dict[f_key]
-            dec_freq = dec_inp_dict[f_key]
+            x_enc_f = x_enc[f_key]
+            x_dec_f = x_dec[f_key]
 
             if self.use_norm:
-                means = x_freq.mean(1, keepdim=True).detach()
-                x_freq = x_freq - means
-                stdev = torch.sqrt(torch.var(x_freq, dim=1, keepdim=True, unbiased=False) + 1e-5)
-                x_freq = x_freq / stdev
+                means = x_enc_f.mean(1, keepdim=True).detach()
+                x_enc_f = x_enc_f - means
+                stdev = torch.sqrt(torch.var(x_enc_f, dim=1, keepdim=True, unbiased=False) + 1e-5)
+                x_enc_f = x_enc_f / stdev
                 means_map[f_key] = means
                 stdev_map[f_key] = stdev
 
-            x_mark_f = None if x_mark_dict is None else x_mark_dict.get(f_key)
-            y_mark_f = None if y_mark_dict is None else y_mark_dict.get(f_key)
+            x_mark_enc_f = None if x_mark_enc is None else x_mark_enc.get(f_key)
+            x_mark_dec_f = None if x_mark_dec is None else x_mark_dec.get(f_key)
 
             # Shared encoder, run per frequency to keep separate encoder states.
-            enc_out_f = self.enc_embeddings_mf[f_key](x_freq, x_mark_f)
+            enc_out_f = self.enc_embeddings_mf[f_key](x_enc_f, x_mark_enc_f)
             enc_out_f, attns_f = self.encoder(enc_out_f, attn_mask=None)
 
             # Shared decoder fed with per-frequency decoder inputs.
-            n_targets = dec_freq.shape[-1]
-            dec_out_f = self.dec_embeddings_mf[f_key](dec_freq, y_mark_f)
+            n_targets = x_dec_f.shape[-1]
+            dec_out_f = self.dec_embeddings_mf[f_key](x_dec_f, x_mark_dec_f)
             dec_out_f = self.decoder(dec_out_f, enc_out_f, x_mask=None, cross_mask=None)
 
             # Keep only original target-variable tokens if mark tokens were appended.
@@ -170,14 +157,12 @@ class MfITransformer(nn.Module):
                 pred_f = pred_f * stdev_map[f_key][:, 0, :].unsqueeze(1).repeat(1, pred_len_f, 1)
                 pred_f = pred_f + means_map[f_key][:, 0, :].unsqueeze(1).repeat(1, pred_len_f, 1)
 
-            outputs[f_key] = pred_f
+            dec_out[f_key] = pred_f
             attn_dict[f_key] = attns_f
 
-        return outputs, attn_dict
+        return dec_out, attn_dict
 
     def forecast(self, x_enc, x_mark_enc, x_dec, x_mark_dec, dataset_idx=0):
-        # DIFF: dataset_idx is used to select the correct embedder for the current batch
-        
         if self.use_norm:
             # Normalization from Non-stationary Transformer
             means = x_enc.mean(1, keepdim=True).detach()
@@ -187,12 +172,11 @@ class MfITransformer(nn.Module):
 
         _, _, N = x_enc.shape # B L N
         # B: batch_size;    E: d_model; 
-        # L: seq_len;        S: pred_len;
+        # L: seq_len;       S: pred_len;
         # N: number of variate (tokens), can also includes covariates
 
         # Embedding
         # B L N -> B N E                (B L N -> B L E in the vanilla Transformer)
-        # DIFF: Selecting the specific embedder based on the dataset/sample rate index
         enc_out = self.enc_embeddings[dataset_idx](x_enc, x_mark_enc) # covariates (e.g timestamp) can be also embedded as tokens
         
         # B N E -> B N E                (B L E -> B L E in the vanilla Transformer)
@@ -215,7 +199,7 @@ class MfITransformer(nn.Module):
                 raise ValueError('Received multi-frequency dict input but MF path is not initialized.')
             if not isinstance(x_dec, dict):
                 raise ValueError('MF path expects dict decoder input x_dec keyed by frequency.')
-            dec_out, attns = self._forecast_mf(x_enc, x_mark_enc, x_dec, x_mark_dec)
+            dec_out, attns = self.forecast_mf(x_enc, x_mark_enc, x_dec, x_mark_dec)
             if self.output_attention:
                 return dec_out, attns
             return dec_out
