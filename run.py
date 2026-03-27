@@ -1,9 +1,51 @@
 import argparse
 import torch
 from experiments.exp_long_term_forecasting import Exp_Long_Term_Forecast
+from experiments.exp_long_term_forecasting_mf import Exp_Long_Term_Forecast_MF
 from experiments.exp_long_term_forecasting_partial import Exp_Long_Term_Forecast_Partial
 import random
 import numpy as np
+from utils.tools import parse_csv_list, parse_group_mapping, parse_float_mapping, parse_int_list
+
+
+def _prepare_mf_args(args):
+    args.mf_enable = True
+    args.mf_freqs_list = parse_csv_list(args.mf_freqs)
+    args.mf_seq_lens_list = parse_int_list(args.mf_seq_lens)
+    args.mf_pred_lens_list = parse_int_list(args.mf_pred_lens) if args.mf_pred_lens else []
+    args.mf_var_groups_map = parse_group_mapping(args.mf_var_groups)
+    args.mf_target_groups_map = parse_group_mapping(args.mf_target_groups)
+    args.mf_loss_weights_map = parse_float_mapping(args.mf_loss_weights)
+
+    if not args.mf_target_groups_map:
+        args.mf_target_groups_map = dict(args.mf_var_groups_map)
+
+    if not args.mf_freqs_list:
+        raise ValueError('mf_enable is set but mf_freqs is empty.')
+    if len(args.mf_freqs_list) != len(args.mf_seq_lens_list):
+        raise ValueError('mf_seq_lens must match mf_freqs length.')
+    if args.mf_pred_lens_list and len(args.mf_pred_lens_list) != len(args.mf_freqs_list):
+        raise ValueError('mf_pred_lens must match mf_freqs length when provided.')
+    for freq in args.mf_freqs_list:
+        if freq not in args.mf_var_groups_map:
+            raise ValueError('Missing variable group for frequency: {}'.format(freq))
+
+    args.mf_seq_lens_map = {
+        freq: seq_len for freq, seq_len in zip(args.mf_freqs_list, args.mf_seq_lens_list)
+    }
+
+    if args.mf_pred_lens_list:
+        args.mf_pred_lens_map = {
+            freq: pred_len for freq, pred_len in zip(args.mf_freqs_list, args.mf_pred_lens_list)
+        }
+    else:
+        args.mf_pred_lens_map = {freq: args.pred_len for freq in args.mf_freqs_list}
+
+    for freq in args.mf_freqs_list:
+        if freq not in args.mf_loss_weights_map:
+            args.mf_loss_weights_map[freq] = 1.0
+
+    return args
 
 if __name__ == '__main__':
     fix_seed = 2023
@@ -17,7 +59,7 @@ if __name__ == '__main__':
     parser.add_argument('--is_training', type=int, required=True, default=1, help='status')
     parser.add_argument('--model_id', type=str, required=True, default='test', help='model id')
     parser.add_argument('--model', type=str, required=True, default='iTransformer',
-                        help='model name, options: [iTransformer, iInformer, iReformer, iFlowformer, iFlashformer]')
+                        help='model name, options: [iTransformer, iInformer, iReformer, iFlowformer, iFlashformer, MfITransformer]')
 
     # data loader
     parser.add_argument('--data', type=str, required=True, default='custom', help='dataset type')
@@ -76,7 +118,7 @@ if __name__ == '__main__':
 
     # iTransformer
     parser.add_argument('--exp_name', type=str, required=False, default='MTSF',
-                        help='experiemnt name, options:[MTSF, partial_train]')
+                        help='experiemnt name, options:[MTSF, partial_train, multi_train]')
     parser.add_argument('--channel_independence', type=bool, default=False, help='whether to use channel_independence mechanism')
     parser.add_argument('--inverse', action='store_true', help='inverse output data', default=False)
     parser.add_argument('--class_strategy', type=str, default='projection', help='projection/average/cls_token')
@@ -87,7 +129,27 @@ if __name__ == '__main__':
     parser.add_argument('--partial_start_index', type=int, default=0, help='the start index of variates for partial training, '
                                                                            'you can select [partial_start_index, min(enc_in + partial_start_index, N)]')
 
+    # Multi-frequency extension (mf mode is enabled when exp_name == 'multi_train')
+    parser.add_argument('--mf_freqs', type=str, default='1h,1d',
+                        help='comma-separated frequencies, e.g. 15min,1h,1d')
+    parser.add_argument('--mf_seq_lens', type=str, default='96,7',
+                        help='comma-separated input lengths aligned with mf_freqs')
+    parser.add_argument('--mf_pred_lens', type=str, default='',
+                        help='optional comma-separated pred lengths aligned with mf_freqs')
+    parser.add_argument('--mf_var_groups', type=str,
+                        default='1h:TEMP|PRES|DEWP|RAIN|WSPM;1d:PM2.5|PM10|SO2|NO2|CO|O3',
+                        help='freq to variables map: freq:var1|var2;freq2:var3|var4')
+    parser.add_argument('--mf_target_groups', type=str, default='',
+                        help='optional freq to target variables map, defaults to mf_var_groups')
+    parser.add_argument('--mf_loss_weights', type=str, default='',
+                        help='optional freq to loss weight map, e.g. 1h:1.0;1d:1.0')
+    parser.add_argument('--mf_anchor_freq', type=str, default='',
+                        help='optional anchor frequency, defaults to the first in mf_freqs')
+
     args = parser.parse_args()
+    
+    if args.exp_name == 'multi_train':
+        args = _prepare_mf_args(args)
     args.use_gpu = True if torch.cuda.is_available() and args.use_gpu else False
 
     if args.use_gpu and args.use_multi_gpu:
@@ -101,6 +163,8 @@ if __name__ == '__main__':
 
     if args.exp_name == 'partial_train': # See Figure 8 of our paper, for the detail
         Exp = Exp_Long_Term_Forecast_Partial
+    elif args.exp_name == 'multi_train': # Multi-frequency extension experiment
+        Exp = Exp_Long_Term_Forecast_MF
     else: # MTSF: multivariate time series forecasting
         Exp = Exp_Long_Term_Forecast
 

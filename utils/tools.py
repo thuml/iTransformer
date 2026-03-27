@@ -113,3 +113,72 @@ def adjustment(gt, pred):
 
 def cal_accuracy(y_pred, y_true):
     return np.mean(y_pred == y_true)
+
+
+# Parsing utilities used by run.py for multifrequency CLI args
+def parse_csv_list(raw_value):
+    """Parse a comma-separated string into a list of stripped items.
+
+    Uses pandas string split for robustness but returns a plain Python list.
+    """
+    if raw_value is None:
+        return []
+    s = str(raw_value)
+    if not s.strip():
+        return []
+    # pandas split is tolerant of surrounding whitespace
+    items = pd.Series([s]).str.split(',').iloc[0]
+    return [item.strip() for item in items if str(item).strip()]
+
+
+def parse_group_mapping(raw_value):
+    """Parse mapping strings like '1h:A|B;1d:C|D' -> {'1h': ['A','B'], '1d': ['C','D']}"""
+    mapping = {}
+    if raw_value is None:
+        return mapping
+    s = str(raw_value).strip()
+    if not s:
+        return mapping
+    entries = [entry.strip() for entry in s.split(';') if entry.strip()]
+    for entry in entries:
+        if ':' not in entry:
+            continue
+        key, value = entry.split(':', 1)
+        items = [item.strip() for item in value.split('|') if item.strip()]
+        mapping[key.strip()] = items
+    return mapping
+
+
+def parse_float_mapping(raw_value):
+    """Parse mapping strings like '1h:1.0;1d:0.5' -> {'1h':1.0, '1d':0.5}"""
+    mapping = {}
+    if raw_value is None:
+        return mapping
+    s = str(raw_value).strip()
+    if not s:
+        return mapping
+    entries = [entry.strip() for entry in s.split(';') if entry.strip()]
+    for entry in entries:
+        if ':' not in entry:
+            continue
+        key, value = entry.split(':', 1)
+        try:
+            mapping[key.strip()] = float(value.strip())
+        except ValueError:
+            # ignore invalid floats
+            continue
+    return mapping
+
+
+def parse_int_list(raw_value):
+    items = parse_csv_list(raw_value)
+    out = []
+    for it in items:
+        try:
+            out.append(int(it))
+        except ValueError:
+            try:
+                out.append(int(float(it)))
+            except ValueError:
+                raise ValueError(f"Invalid integer value in list: {it}")
+    return out

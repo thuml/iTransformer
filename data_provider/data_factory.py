@@ -1,5 +1,5 @@
 from data_provider.data_loader import Dataset_ETT_hour, Dataset_ETT_minute, Dataset_Custom, Dataset_Solar, Dataset_PEMS, \
-    Dataset_Pred
+    Dataset_Pred, Dataset_Airquality
 from torch.utils.data import DataLoader
 
 data_dict = {
@@ -10,6 +10,7 @@ data_dict = {
     'Solar': Dataset_Solar,
     'PEMS': Dataset_PEMS,
     'custom': Dataset_Custom,
+    'Beijing_MF': Dataset_Airquality,
 }
 
 
@@ -34,16 +35,36 @@ def data_provider(args, flag):
         batch_size = args.batch_size  # bsz for train and valid
         freq = args.freq
 
-    data_set = Data(
-        root_path=args.root_path,
-        data_path=args.data_path,
-        flag=flag,
-        size=[args.seq_len, args.label_len, args.pred_len],
-        features=args.features,
-        target=args.target,
-        timeenc=timeenc,
-        freq=freq,
-    )
+    if args.data == 'Beijing_MF' and flag != 'pred':
+        data_set = Data(
+            root_path=args.root_path,
+            data_path=args.data_path,
+            flag=flag,
+            size=[args.seq_len, args.label_len, args.pred_len],
+            features=args.features,
+            target=args.target,
+            scale=getattr(args, 'scale', True),
+            timeenc=timeenc,
+            freq=freq,
+            mf_enable=getattr(args, 'mf_enable', False),
+            mf_freqs=getattr(args, 'mf_freqs_list', []),
+            mf_seq_lens=getattr(args, 'mf_seq_lens_map', {}),
+            mf_pred_lens=getattr(args, 'mf_pred_lens_map', {}),
+            mf_var_groups=getattr(args, 'mf_var_groups_map', {}),
+            mf_target_groups=getattr(args, 'mf_target_groups_map', {}),
+            mf_anchor_freq=getattr(args, 'mf_anchor_freq', ''),
+        )
+    else:
+        data_set = Data(
+            root_path=args.root_path,
+            data_path=args.data_path,
+            flag=flag,
+            size=[args.seq_len, args.label_len, args.pred_len],
+            features=args.features,
+            target=args.target,
+            timeenc=timeenc,
+            freq=freq,
+        )
     print(flag, len(data_set))
     data_loader = DataLoader(
         data_set,

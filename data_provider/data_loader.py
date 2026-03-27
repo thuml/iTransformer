@@ -533,3 +533,190 @@ class Dataset_Pred(Dataset):
 
     def inverse_transform(self, data):
         return self.scaler.inverse_transform(data)
+
+class Dataset_Airquality(Dataset):
+    def __init__(self, root_path, data_path='Aotizhongxin.csv', flag='train',
+                 size=None, features='M', target='PM2.5', scale=True,
+                 timeenc=0, freq='h', mf_enable=False, mf_freqs=None,
+                 mf_seq_lens=None, mf_pred_lens=None, mf_var_groups=None,
+                 mf_target_groups=None, mf_anchor_freq=''):
+        assert flag in ['train', 'test', 'val']
+        type_map = {'train': 0, 'val': 1, 'test': 2}
+        self.set_type = type_map[flag]
+
+        self.root_path = root_path
+        self.data_path = data_path
+        self.target = target
+        self.scale = scale
+        self.timeenc = timeenc
+        self.base_freq = freq
+        self.label_len = size[1] if size is not None else 48
+
+        self.mf_enable = mf_enable
+        self.mf_freqs = mf_freqs or ['1h', '1d']
+        self.mf_seq_lens = mf_seq_lens or {'1h': size[0], '1d': 7}
+        self.mf_pred_lens = mf_pred_lens or {f_key: size[2] for f_key in self.mf_freqs}
+        self.mf_var_groups = mf_var_groups or {
+            '1h': ['TEMP', 'PRES', 'DEWP', 'RAIN', 'WSPM'],
+            '1d': ['PM2.5', 'PM10', 'SO2', 'NO2', 'CO', 'O3'],
+        }
+        self.mf_target_groups = mf_target_groups or dict(self.mf_var_groups)
+        self.mf_anchor_freq = mf_anchor_freq if mf_anchor_freq else self.mf_freqs[0]
+
+        if self.mf_anchor_freq not in self.mf_freqs:
+            raise ValueError('Anchor frequency must be one of mf_freqs.')
+
+        self.scalers = {}
+        self.target_scalers = {}
+        self.freq_inputs = {}
+        self.freq_targets = {}
+        self.freq_indexes = {}
+        self.__read_data__()
+
+    def _build_datetime(self, df_raw):
+        if 'date' in df_raw.columns:
+            dt = pd.to_datetime(df_raw['date'])
+        elif {'year', 'month', 'day', 'hour'}.issubset(set(df_raw.columns)):
+            dt = pd.to_datetime(df_raw[['year', 'month', 'day', 'hour']])
+        else:
+            dt = pd.date_range('2000-01-01', periods=len(df_raw), freq='H')
+        return dt
+
+    def _split_borders(self, total_length, seq_len):
+        num_train = int(total_length * 0.7)
+        num_test = int(total_length * 0.2)
+        num_val = total_length - num_train - num_test
+        border1s = [0, num_train - seq_len, total_length - num_test - seq_len]
+        border2s = [num_train, num_train + num_val, total_length]
+        return border1s, border2s
+
+    def _take_window(self, values, start, end):
+        n_rows = values.shape[0]
+        left = max(start, 0)
+        right = min(end, n_rows)
+        window = values[left:right]
+
+        target_len = end - start
+        if target_len <= 0:
+            return np.zeros((0, values.shape[1]), dtype=np.float32)
+
+        if window.shape[0] == 0:
+            return np.zeros((target_len, values.shape[1]), dtype=np.float32)
+
+        if start < 0:
+            pad = np.repeat(window[0:1], -start, axis=0)
+            window = np.concatenate([pad, window], axis=0)
+        if end > n_rows:
+            pad = np.repeat(window[-1:], end - n_rows, axis=0)
+            window = np.concatenate([window, pad], axis=0)
+
+        if window.shape[0] > target_len:
+            window = window[-target_len:]
+        return window.astype(np.float32)
+
+    def __read_data__(self):
+        df_raw = pd.read_csv(os.path.join(self.root_path, self.data_path))
+        df_raw = df_raw.fillna(method='ffill').fillna(method='bfill')
+        df_raw['date'] = self._build_datetime(df_raw)
+        df_raw = df_raw.sort_values('date').set_index('date')
+
+        for f_key in self.mf_freqs:
+            if f_key not in self.mf_var_groups:
+                raise ValueError('Missing mf_var_groups entry for frequency: {}'.format(f_key))
+            if f_key not in self.mf_target_groups:
+                raise ValueError('Missing mf_target_groups entry for frequency: {}'.format(f_key))
+
+            var_cols = [col for col in self.mf_var_groups[f_key] if col in df_raw.columns]
+            target_cols = [col for col in self.mf_target_groups[f_key] if col in df_raw.columns]
+
+            if not var_cols:
+                raise ValueError('No available input columns for frequency {}'.format(f_key))
+            if not target_cols:
+                raise ValueError('No available target columns for frequency {}'.format(f_key))
+
+            freq_df = df_raw[var_cols].resample(f_key).mean().fillna(method='ffill').fillna(method='bfill')
+            freq_tgt_df = df_raw[target_cols].resample(f_key).mean().fillna(method='ffill').fillna(method='bfill')
+
+            seq_len = self.mf_seq_lens[f_key]
+            border1s, border2s = self._split_borders(len(freq_df), seq_len)
+            border1 = border1s[self.set_type]
+            border2 = border2s[self.set_type]
+
+            train_x = freq_df.iloc[border1s[0]:border2s[0]]
+            train_y = freq_tgt_df.iloc[border1s[0]:border2s[0]]
+
+            if self.scale:
+                x_scaler = StandardScaler()
+                y_scaler = StandardScaler()
+                x_scaler.fit(train_x.values)
+                y_scaler.fit(train_y.values)
+                x_values = x_scaler.transform(freq_df.values)
+                y_values = y_scaler.transform(freq_tgt_df.values)
+                self.scalers[f_key] = x_scaler
+                self.target_scalers[f_key] = y_scaler
+            else:
+                x_values = freq_df.values
+                y_values = freq_tgt_df.values
+                self.scalers[f_key] = None
+                self.target_scalers[f_key] = None
+
+            x_slice = pd.DataFrame(x_values, index=freq_df.index, columns=var_cols).iloc[border1:border2]
+            y_slice = pd.DataFrame(y_values, index=freq_tgt_df.index, columns=target_cols).iloc[border1:border2]
+
+            self.freq_inputs[f_key] = x_slice
+            self.freq_targets[f_key] = y_slice
+            self.freq_indexes[f_key] = x_slice.index
+
+        self.anchor_seq_len = self.mf_seq_lens[self.mf_anchor_freq]
+        self.anchor_pred_len = self.mf_pred_lens[self.mf_anchor_freq]
+
+    def __getitem__(self, index):
+        x_dict = {}
+        y_dict = {}
+        x_mark_dict = {}
+        y_mark_dict = {}
+
+        anchor_idx = self.freq_indexes[self.mf_anchor_freq]
+        anchor_end = index + self.anchor_seq_len
+        anchor_time = anchor_idx[anchor_end - 1]
+
+        for f_key in self.mf_freqs:
+            seq_len = self.mf_seq_lens[f_key]
+            pred_len = self.mf_pred_lens[f_key]
+            x_df = self.freq_inputs[f_key]
+            y_df = self.freq_targets[f_key]
+
+            pos = x_df.index.searchsorted(anchor_time, side='right')
+            seq_x = self._take_window(x_df.values, pos - seq_len, pos)
+            # Mirror SF decoder target contract: [label_len history, pred_len future].
+            seq_y = self._take_window(y_df.values, pos - self.label_len, pos + pred_len)
+
+            x_dict[f_key] = torch.FloatTensor(seq_x)
+            y_dict[f_key] = torch.FloatTensor(seq_y)
+            x_mark_dict[f_key] = torch.zeros((seq_len, 1), dtype=torch.float32)
+            y_mark_dict[f_key] = torch.zeros((self.label_len + pred_len, 1), dtype=torch.float32)
+
+        return x_dict, y_dict, x_mark_dict, y_mark_dict
+
+    def __len__(self):
+        anchor_data_len = len(self.freq_inputs[self.mf_anchor_freq])
+        return max(anchor_data_len - self.anchor_seq_len - self.anchor_pred_len + 1, 0)
+
+    def inverse_transform(self, data, freq_key=None, target=True):
+        if isinstance(data, dict):
+            return {key: self.inverse_transform(value, key, target=target) for key, value in data.items()}
+
+        if freq_key is None:
+            freq_key = self.mf_anchor_freq
+
+        scaler = self.target_scalers[freq_key] if target else self.scalers[freq_key]
+        if scaler is None:
+            return data
+
+        data_np = np.asarray(data)
+        original_shape = data_np.shape
+        if data_np.ndim == 3:
+            data_np = data_np.reshape(-1, data_np.shape[-1])
+            restored = scaler.inverse_transform(data_np)
+            return restored.reshape(original_shape)
+        return scaler.inverse_transform(data_np)
