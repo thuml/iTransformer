@@ -1,4 +1,5 @@
-export CUDA_VISIBLE_DEVICES=3
+PROJECT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../.." >/dev/null 2>&1 && pwd )"
+source "$PROJECT_ROOT/setup_env.sh"
 
 model_name=Transformer
 

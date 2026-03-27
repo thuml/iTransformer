@@ -1,5 +1,4 @@
-export CUDA_VISIBLE_DEVICES=0
-
+# export CUDA_VISIBLE_DEVICES removed; setup_env.sh controls device assignment
 model_name=iTransformer
 # model_name=Transformer
 
