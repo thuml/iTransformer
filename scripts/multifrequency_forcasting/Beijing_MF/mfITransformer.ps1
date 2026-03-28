@@ -20,7 +20,7 @@ if (Test-Path $fallbackCondaPython) {
     $python = 'python'
 }
 $args = @(
-    '-u','run.py',
+    'run.py',
     '--is_training','1',
     '--root_path','./dataset/Beijing_Air',
     '--data_path','PRSA_Data_Aotizhongxin_20130301-20170228.csv',

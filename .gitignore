@@ -137,5 +137,7 @@ settings.json
 /dataset
 /checkpoints
 /results
+/test_results
 result_*
+
 

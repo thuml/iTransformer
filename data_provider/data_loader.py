@@ -537,7 +537,7 @@ class Dataset_Pred(Dataset):
 class Dataset_Airquality(Dataset):
     def __init__(self, root_path, data_path='Aotizhongxin.csv', flag='train',
                  size=None, features='M', target='PM2.5', scale=True,
-                 timeenc=0, freq='h', mf_enable=False, mf_freqs=None,
+                 timeenc=0, freq='h', mf_freqs=None,
                  mf_seq_lens=None, mf_pred_lens=None, mf_var_groups=None,
                  mf_target_groups=None, mf_anchor_freq=''):
         assert flag in ['train', 'test', 'val']
@@ -552,7 +552,6 @@ class Dataset_Airquality(Dataset):
         self.base_freq = freq
         self.label_len = size[1] if size is not None else 48
 
-        self.mf_enable = mf_enable
         self.mf_freqs = mf_freqs or ['1h', '1d']
         self.mf_seq_lens = mf_seq_lens or {'1h': size[0], '1d': 7}
         self.mf_pred_lens = mf_pred_lens or {f_key: size[2] for f_key in self.mf_freqs}

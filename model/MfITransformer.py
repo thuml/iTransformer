@@ -6,25 +6,24 @@ from layers.Embed import DataEmbedding_inverted
 from typing import Dict, Optional, Tuple
 
 
-class MfITransformer(nn.Module):
+class Model(nn.Module):
     """
     Paper link: https://arxiv.org/abs/2310.06625
     Extended for multi-frequency datasets.
     """
 
     def __init__(self, configs):
-        super(MfITransformer, self).__init__()
+        super(Model, self).__init__()
         self.pred_len = configs.pred_len
         self.output_attention = configs.output_attention
         self.use_norm = configs.use_norm
 
-        self.mf_enable = getattr(configs, 'mf_enable', False)
         self.mf_freqs = getattr(configs, 'mf_freqs_list', [])
         self.mf_seq_lens = getattr(configs, 'mf_seq_lens_map', {})
         self.mf_pred_lens = getattr(configs, 'mf_pred_lens_map', {})
 
-        if not self.mf_enable or not self.mf_freqs:
-            raise ValueError('MfITransformer requires mf_enable=True and non-empty mf_freqs_list.')
+        if not self.mf_freqs:
+            raise ValueError('MfITransformer requires non-empty mf_freqs_list.')
 
         self.enc_embeddings_mf = nn.ModuleDict({
             f_key: DataEmbedding_inverted(
@@ -34,6 +33,11 @@ class MfITransformer(nn.Module):
                 configs.freq,
                 configs.dropout,
             )
+            for f_key in self.mf_freqs
+        })
+
+        self.freq_embeddings = nn.ParameterDict({
+            f_key: nn.Parameter(torch.zeros(configs.d_model))
             for f_key in self.mf_freqs
         })
         
@@ -78,11 +82,14 @@ class MfITransformer(nn.Module):
         x_dec: Dict[str, torch.Tensor],
         x_mark_dec: Optional[Dict[str, torch.Tensor]],
     ) -> Tuple[Dict[str, torch.Tensor], Dict[str, list]]:
-        """Forecast per frequency with shared encoder/trunk and per-frequency heads."""
+        """Forecast via latent fusion over all frequencies in a single encoder pass."""
         dec_out = {}
         attn_dict = {}
         means_map = {}
         stdev_map = {}
+        token_counts = {}
+        token_slices = {}
+        fused_tokens = []
 
         for f_key in self.mf_freqs:
             if f_key not in x_enc:
@@ -103,10 +110,28 @@ class MfITransformer(nn.Module):
 
             x_mark_enc_f = None if x_mark_enc is None else x_mark_enc.get(f_key)
 
-            # Shared encoder and optional shared FF trunk.
-            enc_out_f = self.enc_embeddings_mf[f_key](x_enc_f, x_mark_enc_f)
-            enc_out_f, attns_f = self.encoder(enc_out_f, attn_mask=None)
-            shared_tokens_f = self.shared_trunk(enc_out_f)
+            # Project each frequency to token space and inject frequency identity.
+            tokens_f = self.enc_embeddings_mf[f_key](x_enc_f, x_mark_enc_f)
+            n_tokens_f = tokens_f.shape[1]
+            token_counts[f_key] = n_tokens_f
+            fused_tokens.append(tokens_f + self.freq_embeddings[f_key].view(1, 1, -1))
+
+        if not fused_tokens:
+            return dec_out, attn_dict
+
+        combined_tokens = torch.cat(fused_tokens, dim=1)
+        combined_tokens, attns = self.encoder(combined_tokens, attn_mask=None)
+        combined_tokens = self.shared_trunk(combined_tokens)
+
+        offset = 0
+        for f_key in self.mf_freqs:
+            n_tokens_f = token_counts[f_key]
+            token_slices[f_key] = combined_tokens[:, offset:offset + n_tokens_f, :]
+            offset += n_tokens_f
+
+        for f_key in self.mf_freqs:
+            x_dec_f = x_dec[f_key]
+            shared_tokens_f = token_slices[f_key]
 
             # Use target-token count from decoder-input dict to support
             # frequency-specific target groups.
@@ -123,11 +148,13 @@ class MfITransformer(nn.Module):
 
             if self.use_norm:
                 pred_len_f = pred_f.shape[1]
-                pred_f = pred_f * stdev_map[f_key][:, 0, :].unsqueeze(1).repeat(1, pred_len_f, 1)
-                pred_f = pred_f + means_map[f_key][:, 0, :].unsqueeze(1).repeat(1, pred_len_f, 1)
+                stdev_f = stdev_map[f_key][:, 0, :n_targets].unsqueeze(1).repeat(1, pred_len_f, 1)
+                means_f = means_map[f_key][:, 0, :n_targets].unsqueeze(1).repeat(1, pred_len_f, 1)
+                pred_f = pred_f * stdev_f
+                pred_f = pred_f + means_f
 
             dec_out[f_key] = pred_f
-            attn_dict[f_key] = attns_f
+            attn_dict[f_key] = attns
 
         return dec_out, attn_dict
 
@@ -145,10 +172,3 @@ class MfITransformer(nn.Module):
         if self.output_attention:
             return dec_out, attns
         return dec_out
-
-
-class Model(MfITransformer):
-    """Compatibility alias used by experiment loaders."""
-
-    pass
-

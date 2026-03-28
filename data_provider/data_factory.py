@@ -46,7 +46,6 @@ def data_provider(args, flag):
             scale=getattr(args, 'scale', True),
             timeenc=timeenc,
             freq=freq,
-            mf_enable=getattr(args, 'mf_enable', False),
             mf_freqs=getattr(args, 'mf_freqs_list', []),
             mf_seq_lens=getattr(args, 'mf_seq_lens_map', {}),
             mf_pred_lens=getattr(args, 'mf_pred_lens_map', {}),

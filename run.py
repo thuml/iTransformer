@@ -9,7 +9,6 @@ from utils.tools import parse_csv_list, parse_group_mapping, parse_float_mapping
 
 
 def _prepare_mf_args(args):
-    args.mf_enable = True
     args.mf_freqs_list = parse_csv_list(args.mf_freqs)
     args.mf_seq_lens_list = parse_int_list(args.mf_seq_lens)
     args.mf_pred_lens_list = parse_int_list(args.mf_pred_lens) if args.mf_pred_lens else []
@@ -21,7 +20,7 @@ def _prepare_mf_args(args):
         args.mf_target_groups_map = dict(args.mf_var_groups_map)
 
     if not args.mf_freqs_list:
-        raise ValueError('mf_enable is set but mf_freqs is empty.')
+        raise ValueError('mf_freqs is empty.')
     if len(args.mf_freqs_list) != len(args.mf_seq_lens_list):
         raise ValueError('mf_seq_lens must match mf_freqs length.')
     if args.mf_pred_lens_list and len(args.mf_pred_lens_list) != len(args.mf_freqs_list):
