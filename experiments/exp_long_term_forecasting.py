@@ -23,6 +23,9 @@ class Exp_Long_Term_Forecast(Exp_Basic):
 
         if self.args.use_multi_gpu and self.args.use_gpu:
             model = nn.DataParallel(model, device_ids=self.args.device_ids)
+
+        total_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+        print(f"====== Total Trainable Parameters: {total_params:,} ======")
         return model
 
     def _get_data(self, flag):
@@ -182,6 +185,11 @@ class Exp_Long_Term_Forecast(Exp_Basic):
 
         best_model_path = path + '/' + 'checkpoint.pth'
         self.model.load_state_dict(torch.load(best_model_path))
+
+        if torch.cuda.is_available():
+            peak_memory_gb = torch.cuda.max_memory_allocated() / (1024 ** 3)
+            print(f"====== Peak GPU Memory Utilization: {peak_memory_gb:.2f} GB ======")
+            torch.cuda.reset_peak_memory_stats()
 
         return self.model
 

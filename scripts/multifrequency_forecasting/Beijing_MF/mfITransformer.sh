@@ -13,10 +13,6 @@ python -u run.py \
   --data Beijing_MF \
   --features M \
   --target PM2.5 \
-  --freq h \
-  --seq_len 96 \
-  --label_len 48 \
-  --pred_len 24 \
   --enc_in 11 \
   --dec_in 11 \
   --c_out 11 \
@@ -34,8 +30,8 @@ python -u run.py \
   --train_epochs 10 \
   --patience 3 \
   --mf_freqs 1h,1d \
-  --mf_seq_lens 96,7 \
-  --mf_pred_lens 24,2 \
+  --mf_seq_lens 96,4 \
+  --mf_pred_lens 24,1 \
   --mf_var_groups '1h:TEMP|PRES|DEWP|RAIN|WSPM;1d:PM2.5|PM10|SO2|NO2|CO|O3' \
   --mf_target_groups '1h:TEMP|PRES|DEWP|RAIN|WSPM;1d:PM2.5|PM10|SO2|NO2|CO|O3' \
   --mf_loss_weights '1h:1.0;1d:1.0'

@@ -40,6 +40,16 @@ def _prepare_mf_args(args):
     else:
         args.mf_pred_lens_map = {freq: args.pred_len for freq in args.mf_freqs_list}
 
+    # In MF mode, derive shared core fields from the anchor frequency so
+    # downstream components do not depend on stale single-frequency values.
+    args.mf_anchor_freq = args.mf_anchor_freq if args.mf_anchor_freq else args.mf_freqs_list[0]
+    if args.mf_anchor_freq not in args.mf_freqs_list:
+        raise ValueError('mf_anchor_freq must be one of mf_freqs.')
+
+    args.seq_len = args.mf_seq_lens_map[args.mf_anchor_freq]
+    args.pred_len = args.mf_pred_lens_map[args.mf_anchor_freq]
+    args.freq = args.mf_anchor_freq
+
     for freq in args.mf_freqs_list:
         if freq not in args.mf_loss_weights_map:
             args.mf_loss_weights_map[freq] = 1.0

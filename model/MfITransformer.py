@@ -10,14 +10,28 @@ class Model(nn.Module):
     """
     Paper link: https://arxiv.org/abs/2310.06625
     Extended for multi-frequency datasets.
+
+        Comparison notes against iTransformer:
+        - Sections are marked with === SAME === or === MODIFIED ===.
+        - SAME means the modeling step is conceptually the same,
+            even if MF uses dicts/loops/ModuleDict naming.
+    - "Step" states what this block does.
+    - "Why" states why it differs (or matches) relative to iTransformer.
     """
 
     def __init__(self, configs):
         super(Model, self).__init__()
+
+        # === SAME (vs iTransformer) ===
+        # Step: initialize shared forecasting flags.
+        # Why: these controls are identical core behavior knobs.
         self.pred_len = configs.pred_len
         self.output_attention = configs.output_attention
         self.use_norm = configs.use_norm
 
+        # === MODIFIED (vs iTransformer) ===
+        # Step: load multi-frequency metadata from parsed CLI/config maps.
+        # Why: MfITransformer needs per-frequency sequence/prediction settings.
         self.mf_freqs = getattr(configs, 'mf_freqs_list', [])
         self.mf_seq_lens = getattr(configs, 'mf_seq_lens_map', {})
         self.mf_pred_lens = getattr(configs, 'mf_pred_lens_map', {})
@@ -25,6 +39,9 @@ class Model(nn.Module):
         if not self.mf_freqs:
             raise ValueError('MfITransformer requires non-empty mf_freqs_list.')
 
+        # === SAME (concept vs iTransformer) ===
+        # Step: map time-series input into token embeddings.
+        # Why: same embedding stage, implemented per frequency for MF inputs.
         self.enc_embeddings_mf = nn.ModuleDict({
             f_key: DataEmbedding_inverted(
                 self.mf_seq_lens[f_key],
@@ -36,12 +53,22 @@ class Model(nn.Module):
             for f_key in self.mf_freqs
         })
 
+        # === MODIFIED (vs iTransformer) ===
+        # Step: create learnable frequency identity vectors.
+        # Why: shared encoder benefits from explicit frequency context.
         self.freq_embeddings = nn.ParameterDict({
             f_key: nn.Parameter(torch.zeros(configs.d_model))
             for f_key in self.mf_freqs
         })
         
+        # === SAME (vs iTransformer) ===
+        # Step: keep class_strategy assignment for config compatibility.
+        # Why: retained from base family even if unused in current forecast path.
         self.class_strategy = configs.class_strategy
+
+        # === SAME (vs iTransformer) ===
+        # Step: keep the same encoder architecture.
+        # Why: attention/FFN stack is reused; only data flow differs.
         # Shared encoder across all frequency keys.
         self.encoder = Encoder(
             [
@@ -58,18 +85,9 @@ class Model(nn.Module):
             norm_layer=torch.nn.LayerNorm(configs.d_model)
         )
 
-        # Optional shared feed-forward trunk after the shared encoder.
-        mf_trunk_hidden = getattr(configs, 'mf_trunk_hidden', 0)
-        if isinstance(mf_trunk_hidden, int) and mf_trunk_hidden > 0:
-            self.shared_trunk = nn.Sequential(
-                nn.Linear(configs.d_model, mf_trunk_hidden),
-                nn.GELU(),
-                nn.Dropout(configs.dropout),
-                nn.Linear(mf_trunk_hidden, configs.d_model),
-            )
-        else:
-            self.shared_trunk = nn.Identity()
-
+        # === SAME (concept vs iTransformer) ===
+        # Step: project encoded tokens to prediction horizon.
+        # Why: same projection idea, instantiated per frequency in MF mode.
         self.projection_heads = nn.ModuleDict({
             f_key: nn.Linear(configs.d_model, self.mf_pred_lens.get(f_key, configs.pred_len), bias=True)
             for f_key in self.mf_freqs
@@ -82,6 +100,9 @@ class Model(nn.Module):
         x_dec: Dict[str, torch.Tensor],
         x_mark_dec: Optional[Dict[str, torch.Tensor]],
     ) -> Tuple[Dict[str, torch.Tensor], Dict[str, list]]:
+        # === MODIFIED (vs iTransformer) ===
+        # Step: run multi-frequency forecasting in one fused latent pass.
+        # Why: enables cross-frequency information sharing before projection.
         """Forecast via latent fusion over all frequencies in a single encoder pass."""
         dec_out = {}
         attn_dict = {}
@@ -91,6 +112,9 @@ class Model(nn.Module):
         token_slices = {}
         fused_tokens = []
 
+        # === SAME (concept vs iTransformer) ===
+        # Step: normalize input then embed before encoder.
+        # Why: same normalization+embedding pipeline, executed per frequency.
         for f_key in self.mf_freqs:
             if f_key not in x_enc:
                 raise ValueError('Missing frequency key in x_enc: {}'.format(f_key))
@@ -119,16 +143,28 @@ class Model(nn.Module):
         if not fused_tokens:
             return dec_out, attn_dict
 
+        # === MODIFIED (vs iTransformer) ===
+        # Step: concatenate tokens from all frequencies before encoding.
+        # Why: this latent fusion step is MF-specific and not in iTransformer.
         combined_tokens = torch.cat(fused_tokens, dim=1)
-        combined_tokens, attns = self.encoder(combined_tokens, attn_mask=None)
-        combined_tokens = self.shared_trunk(combined_tokens)
 
+        # === SAME (concept vs iTransformer) ===
+        # Step: run token sequence through the shared encoder.
+        # Why: same encoder operation as iTransformer once tokens are formed.
+        combined_tokens, attns = self.encoder(combined_tokens, attn_mask=None)
+
+        # === MODIFIED (vs iTransformer) ===
+        # Step: split encoded tokens back into frequency-specific slices.
+        # Why: each frequency uses its own projection head afterward.
         offset = 0
         for f_key in self.mf_freqs:
             n_tokens_f = token_counts[f_key]
             token_slices[f_key] = combined_tokens[:, offset:offset + n_tokens_f, :]
             offset += n_tokens_f
 
+        # === SAME (concept vs iTransformer) ===
+        # Step: project model outputs and denormalize back to original scale.
+        # Why: same projection+denormalization step, repeated per frequency.
         for f_key in self.mf_freqs:
             x_dec_f = x_dec[f_key]
             shared_tokens_f = token_slices[f_key]
@@ -159,6 +195,9 @@ class Model(nn.Module):
         return dec_out, attn_dict
 
     def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec, mask=None, dataset_idx=0):
+        # === MODIFIED (vs iTransformer) ===
+        # Step: enforce dict inputs keyed by frequency before forward pass.
+        # Why: MfITransformer contract is multi-frequency dictionaries, not a single tensor.
         if not isinstance(x_enc, dict):
             raise ValueError('MfITransformer only supports dict input x_enc keyed by frequency.')
         if not isinstance(x_dec, dict):
@@ -168,6 +207,9 @@ class Model(nn.Module):
         if x_mark_dec is not None and not isinstance(x_mark_dec, dict):
             raise ValueError('MfITransformer expects dict x_mark_dec when provided.')
 
+        # === SAME (concept vs iTransformer) ===
+        # Step: return predictions and optional attention outputs.
+        # Why: same output_attention branch pattern with MF-shaped return values.
         dec_out, attns = self.forecast_mf(x_enc, x_mark_enc, x_dec, x_mark_dec)
         if self.output_attention:
             return dec_out, attns

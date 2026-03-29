@@ -14,6 +14,9 @@ from typing import Dict
 warnings.filterwarnings('ignore')
 
 
+# === MODIFIED (vs Exp_Long_Term_Forecast) ===
+# Step: define MF-specific experiment variant.
+# Why: this class keeps the same training lifecycle but adapts data/outputs to frequency-keyed dicts.
 class Exp_Long_Term_Forecast_MF(Exp_Basic):
     """Mixed-frequency long-term forecasting experiment.
 
@@ -29,31 +32,52 @@ class Exp_Long_Term_Forecast_MF(Exp_Basic):
 
     def __init__(self, args):
         """Initialize multi-frequency forecasting experiment with parsed CLI args."""
+        # === SAME (concept vs Exp_Long_Term_Forecast) ===
+        # Step: delegate core setup to Exp_Basic.
+        # Why: device/model lifecycle is unchanged.
         super(Exp_Long_Term_Forecast_MF, self).__init__(args)
 
     def _build_model(self):
         """Instantiate model by name and optionally wrap with DataParallel."""
+        # === SAME (concept vs Exp_Long_Term_Forecast) ===
+        # Step: resolve model from registry and apply DataParallel if configured.
+        # Why: model construction path is the same as the SF experiment.
         model = self.model_dict[self.args.model].Model(self.args).float()
 
         if self.args.use_multi_gpu and self.args.use_gpu:
             model = nn.DataParallel(model, device_ids=self.args.device_ids)
+
+        total_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+        print(f"====== Total Trainable Parameters: {total_params:,} ======")
         return model
 
     def _get_data(self, flag):
         """Create dataset/dataloader pair for split: train, val, test, or pred."""
+        # === SAME (concept vs Exp_Long_Term_Forecast) ===
+        # Step: fetch split-specific dataset and dataloader.
+        # Why: MF reuses the same data_provider entry point.
         data_set, data_loader = data_provider(self.args, flag)
         return data_set, data_loader
 
     def _select_optimizer(self):
         """Create optimizer used for training."""
+        # === SAME (concept vs Exp_Long_Term_Forecast) ===
+        # Step: use Adam optimizer over model parameters.
+        # Why: optimization strategy is unchanged.
         model_optim = optim.Adam(self.model.parameters(), lr=self.args.learning_rate)
         return model_optim
 
     def _select_criterion(self):
         """Return the base regression loss."""
+        # === SAME (concept vs Exp_Long_Term_Forecast) ===
+        # Step: select MSE as base criterion.
+        # Why: only aggregation differs in MF, not the base loss function.
         criterion = nn.MSELoss()
         return criterion
 
+    # === ADDED (vs Exp_Long_Term_Forecast) ===
+    # Step: recursively move tensor-like objects to device.
+    # Why: MF batches are dict-structured and require recursive handling.
     def _to_device(self, obj):
         """Recursively move tensors (including nested dict values) to target device."""
         if isinstance(obj, dict):
@@ -62,6 +86,9 @@ class Exp_Long_Term_Forecast_MF(Exp_Basic):
             return None
         return obj.float().to(self.device)
 
+    # === ADDED (vs Exp_Long_Term_Forecast) ===
+    # Step: validate MF batch structure and move all fields to device.
+    # Why: MF assumes frequency-keyed dict batches rather than plain tensors.
     def _prepare_batch(self, batch_x, batch_y, batch_x_mark, batch_y_mark):
         """Validate MF batch format and move all tensors to the selected device."""
         if not isinstance(batch_x, dict):
@@ -73,6 +100,9 @@ class Exp_Long_Term_Forecast_MF(Exp_Basic):
         batch_y_mark = self._to_device(batch_y_mark)
         return batch_x, batch_y, batch_x_mark, batch_y_mark
 
+    # === ADDED (vs Exp_Long_Term_Forecast) ===
+    # Step: build decoder input per frequency using label history + zero placeholders.
+    # Why: each frequency can have its own prediction horizon in MF mode.
     def _build_dec_input(self, batch_y: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
         """Build per-frequency decoder input as [history(label_len), zeros(pred_len)]."""
         dec_inp = {}
@@ -92,6 +122,9 @@ class Exp_Long_Term_Forecast_MF(Exp_Basic):
 
         return dec_inp
 
+    # === ADDED (vs Exp_Long_Term_Forecast) ===
+    # Step: slice prediction targets per frequency.
+    # Why: target horizon can differ by frequency.
     def _slice_targets(self, batch_y: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
         """Extract per-frequency prediction horizon targets from decoder-format targets."""
         targets = {}
@@ -101,6 +134,9 @@ class Exp_Long_Term_Forecast_MF(Exp_Basic):
             targets[f_key] = y_f[:, -pred_len_f:, :]
         return targets
 
+    # === ADDED (vs Exp_Long_Term_Forecast) ===
+    # Step: centralize model forward and optional attention unwrapping.
+    # Why: train/vali/test/predict share identical forward-pass handling.
     def _forward_pass(self, batch_x, batch_x_mark, dec_inp, batch_y_mark):
         """Run MF encoder-decoder forward pass and unwrap attention output if requested."""
         if self.args.use_amp:
@@ -114,6 +150,9 @@ class Exp_Long_Term_Forecast_MF(Exp_Basic):
                 outputs = outputs[0]
         return outputs
 
+    # === ADDED (vs Exp_Long_Term_Forecast) ===
+    # Step: aggregate criterion over all frequency heads with optional weights.
+    # Why: MF optimization needs per-frequency balancing.
     def _compute_loss(self, outputs, targets, criterion):
         """Aggregate weighted loss over all configured MF frequency heads."""
         loss = 0.0
@@ -125,6 +164,9 @@ class Exp_Long_Term_Forecast_MF(Exp_Basic):
             loss = loss + weight * criterion(pred, targets[f_key])
         return loss
 
+    # === MODIFIED (vs Exp_Long_Term_Forecast) ===
+    # Step: run validation over dict batches using MF helper pipeline.
+    # Why: same validation objective, generalized to per-frequency tensors.
     def vali(self, vali_data, vali_loader, criterion):
         """Evaluate average MF validation loss across the validation dataloader."""
         total_loss = []
@@ -144,6 +186,9 @@ class Exp_Long_Term_Forecast_MF(Exp_Basic):
         self.model.train()
         return total_loss
 
+    # === MODIFIED (vs Exp_Long_Term_Forecast) ===
+    # Step: run the standard epoch training loop.
+    # Why: same training lifecycle, with MF batch prep and weighted multi-head loss.
     def train(self, setting):
         """Train MF model using weighted per-frequency losses and early stopping."""
         train_data, train_loader = self._get_data(flag='train')
@@ -215,8 +260,17 @@ class Exp_Long_Term_Forecast_MF(Exp_Basic):
 
         best_model_path = path + '/' + 'checkpoint.pth'
         self.model.load_state_dict(torch.load(best_model_path))
+
+        if torch.cuda.is_available():
+            peak_memory_gb = torch.cuda.max_memory_allocated() / (1024 ** 3)
+            print(f"====== Peak GPU Memory Utilization: {peak_memory_gb:.2f} GB ======")
+            torch.cuda.reset_peak_memory_stats()
+
         return self.model
 
+    # === MODIFIED (vs Exp_Long_Term_Forecast) ===
+    # Step: evaluate and persist predictions/metrics per frequency key.
+    # Why: MF outputs are dicts; metrics must be computed per frequency.
     def test(self, setting, test=0):
         """Evaluate MF test performance and persist per-frequency predictions/metrics."""
         test_data, test_loader = self._get_data(flag='test')
@@ -241,6 +295,7 @@ class Exp_Long_Term_Forecast_MF(Exp_Basic):
                     if f_key not in preds:
                         preds[f_key] = []
                         trues[f_key] = []
+                    # MF outputs are kept in normalized space here; post-processing handles inverse transform.
                     preds[f_key].append(pred.detach().cpu().numpy())
                     trues[f_key].append(targets[f_key].detach().cpu().numpy())
 
@@ -268,6 +323,9 @@ class Exp_Long_Term_Forecast_MF(Exp_Basic):
 
         return
 
+    # === MODIFIED (vs Exp_Long_Term_Forecast) ===
+    # Step: run prediction and save results per frequency.
+    # Why: MF inference returns a dict of forecasts, not a single tensor.
     def predict(self, setting, load=False):
         """Run MF inference and save one prediction file per frequency key."""
         pred_data, pred_loader = self._get_data(flag='pred')
@@ -293,6 +351,7 @@ class Exp_Long_Term_Forecast_MF(Exp_Basic):
                 for f_key, pred in outputs.items():
                     preds_np = pred.detach().cpu().numpy()
                     np.save(folder_path + 'real_prediction_{}.npy'.format(f_key), preds_np)
+                # Assumes pred_loader yields a single batch; remove this return for multi-batch export.
                 return
 
         return
